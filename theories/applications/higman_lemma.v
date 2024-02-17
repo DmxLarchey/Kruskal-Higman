@@ -55,5 +55,5 @@ Section Higman_lemma.
 
 End Higman_lemma.
 
-About Higman_lemma.
-Print Assumptions Higman_lemma.
+About Higman_lemma_strong.
+Print Assumptions Higman_lemma_strong.

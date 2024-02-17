@@ -80,10 +80,6 @@ Proof.
     * (* X cannot be empty/▢ because it is inhabited by x *)
       simpl in HR; tauto.
 
-  + (* The case of nodes ⟨α|τ⟩₁, depending on sT ∈ {◩,▣} or sT = ▢ *)
-    destruct sT as [ c | ].
-    * (* either T is af/◩ or T is full/▣ *)
-      now apply af_utree_nodes with sR (Some c); auto.
-    * (* Y cannot be empty/▢ because it is inhabited by α *)
-      exfalso; revert α; apply HT.
+  + (* The case of nodes ⟨α|τ⟩₁ developed in af_utree_embed_fun.v *)
+    eapply af_utree_nodes; eauto.
 Qed.

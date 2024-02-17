@@ -7,4 +7,4 @@
 (*        Mozilla Public License Version 2.0, MPL-2.0         *)
 (**************************************************************)
 
-From KruskalAfProp Require Export base notations almost_full.
+From KruskalAfType Require Export base notations almost_full.

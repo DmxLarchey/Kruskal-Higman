@@ -21,7 +21,10 @@ Set Implicit Arguments.
 
 Section fan_on_list.
 
-  (* That proof of the FAN theorem is derived from Daniel Fridlender's paper *)
+  (** That proof of the FAN theorem is derived 
+     from Daniel Fridlender's paper 
+
+      https://www.brics.dk/RS/98/39/BRICS-RS-98-39.pdf  *)
 
   Notation mono P := (∀ x l, P l → P (x::l)).
 
