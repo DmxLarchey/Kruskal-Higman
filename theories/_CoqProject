@@ -1,0 +1,31 @@
+-R . KruskalHigmanProp
+
+tactics.v
+
+# base.v exports KruskalAfProp or KruskalAfType
+base/base.v
+
+list/list_utils.v
+list/list_fan.v
+
+embeddings/list_embed.v
+embeddings/vec_embed.v
+embeddings/utree_embed.v
+
+choice/indexed_choice.v
+choice/combi_principle.v
+choice/choice_base.v
+
+wf/wf_upto.v
+
+af/fan.v
+af/af_lex.v
+af/af_quasi_morphism_decidable.v
+af/af_quasi_morphism.v
+af/af_utree_embed_fun.v
+af/af_utree_embed.v
+af/af_list_embed.v
+af/af_vec_embed.v
+
+applications/higman_lemma.v
+
