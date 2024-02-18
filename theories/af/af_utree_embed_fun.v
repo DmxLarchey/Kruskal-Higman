@@ -320,7 +320,41 @@ Section af_utree_nodes.
           rewrite Hc in HT; simpl in HT; auto.
     Qed.
 
+    Local Fact E_embed_rev t : ⟨α|τ⟩₁ ≼ t → E t.
+    Proof.
+      intros H t' <-.
+      induction t' as [ [ | (x2,t2)] | y t' IH ]; simpl in H.
+      + now apply utree_embed_inv_right in H as (? & ? & _).
+      + apply utree_embed_inv_right in H as [ H | (? & ? & [=] & G1 & G2) ].
+        * exists ⟨⦗x2,t2⦘₂⟩₀; split.
+          - constructor.
+          - constructor 2.
+            revert H; apply utree_embed_trans.
+        * subst; red.
+          exists ⟨⦗x2,t2⦘₂⟩₀; split.
+          - constructor.
+          - now constructor 2.
+      + destruct c; [ | destruct y ].
+        apply utree_embed_inv_right in H as [ H | (? & ? & [=] & ? & ?) ].
+        * apply IH in H as (v & ? & ?).
+          exists v; split; auto; now constructor 2.
+        * subst.
+          red. 
+          exists ⟨y|t'⟩₁; split.
+          - constructor 1.
+          - now constructor 1.
+    Qed. 
+
+    Local Theorem E_embed_iff t : E t ↔ ⟨α|τ⟩₁ ≼ t.
+    Proof.
+      split.
+      + apply E_embed.
+      + apply E_embed_rev.
+    Qed.
+     
   End only_improper_analyses.
+
+  Check E_embed_iff.
 
   Hypotheses (IHτ : af (utree_embed R T)↑τ)
 

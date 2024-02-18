@@ -57,6 +57,31 @@ Section utree_embed.
     | utree_embed_root y₁ t₁ y₂ t₂ : T y₁ y₂ → t₁ ≤ₑ t₂ → ⟨y₁|t₁⟩₁ ≤ₑ ⟨y₂|t₂⟩₁
   where "s ≤ₑ t" := (@utree_embed _ _ s t).
 
+  Fact utree_embed_inv_right R T s t :
+          utree_embed R T s t
+        → match t with
+          | ⟨x₂⟩₀    => ∃ x₁, s = ⟨x₁⟩₀ ∧ R x₁ x₂
+          | ⟨y₂|t₂⟩₁ => utree_embed R T s t₂
+                      ∨ ∃ y₁ t₁, s = ⟨y₁|t₁⟩₁ ∧ T y₁ y₂ ∧ utree_embed R T t₁ t₂
+          end.
+  Proof.
+    intros []; eauto.
+    right; eauto.
+  Qed.
+
+  Fact utree_sub_embed R T r s t : r ≤ut s → utree_embed R T s t → utree_embed R T r t.
+  Proof.
+    induction 1 as [ | r y s H IH ] in t |- *; auto.
+    induction t as  [ x | y' t IHt ].
+    + now intros (? & ? & _)%utree_embed_inv_right.
+    + intros [ ? | (? & ? & [=] & ? & ?) ]%utree_embed_inv_right.
+      * constructor 2; eauto.
+      * subst; constructor 2; eauto.
+  Qed.
+
+  Fact utree_embed_trans R T x s t : utree_embed R T ⟨x|s⟩₁ t → utree_embed R T s t.
+  Proof. apply utree_sub_embed; eauto. Qed.
+
 End utree_embed.
 
 #[global] Hint Constructors sub_utree utree_embed : utree_db.
