@@ -1,9 +1,9 @@
--R . KruskalHigmanProp
 
 tactics.v
 
-# base.v exports KruskalAfProp or KruskalAfType
+# base.v is either implem/prop.v implem/type.v
 base/base.v
+base/base_implem.v
 
 list/list_utils.v
 list/list_fan.v
