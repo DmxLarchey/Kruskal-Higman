@@ -323,7 +323,8 @@ Section af_utree_nodes.
 
   End af_choice.
 
-  Notation c := af_choice_sT.
+  Notation c₀ := af_choice_sT.
+  Notation Hc₀ := af_choice_sT_spec.
 
   Section exceptional_vs_embedding.
 
@@ -336,7 +337,7 @@ Section af_utree_nodes.
         contain a disapointing sub-tree *)
 
     (* Every analysis of t is exceptional *)
-    Notation E t := (ana c t ⊆₁ E' c).
+    Notation E t := (ana c₀ t ⊆₁ E' c₀).
 
     Local Remark embed_exceptional t : ⟨α|τ⟩₁ ≼ t → E t.
     Proof.
@@ -345,7 +346,7 @@ Section af_utree_nodes.
       + now apply utree_embed_inv_10 in H.
       + exists ⟨⦗x2,t2⦘₂⟩₀; split; eauto with utree_db.
         apply utree_embed_inv_11 in H as [ | [] ]; eauto with utree_db.
-      + destruct c; [ | destruct y ].
+      + destruct c₀; [ | destruct y ].
         apply utree_embed_inv_11 in H as [ (v & [])%IH | [] ].
         * exists v; eauto with utree_db.
         * exists ⟨y|t'⟩₁; eauto with utree_db.
@@ -357,11 +358,11 @@ Section af_utree_nodes.
     (** Let us first study exceptional leaves (of arity 0) *)
 
     (* A leaf (analysis) is exceptional only if it is disapointing *)
-    Local Fact E'_D'_leaf x' : E' c ⟨x'⟩₀ → D' c ⟨x'⟩₀.
+    Local Fact E'_D'_leaf x' : E' c₀ ⟨x'⟩₀ → D' c₀ ⟨x'⟩₀.
     Proof. now intros (? & [ -> | [] ]%sub_utree_inv_right & ?). Qed.
  
     (* An evaluation of a leaf is exceptional only if this leaf is disapointing *)
-    Local Fact E_D'_leaf x' t : E t → ana c t ⟨x'⟩₀ → D' c ⟨x'⟩₀.
+    Local Fact E_D'_leaf x' t : E t → ana c₀ t ⟨x'⟩₀ → D' c₀ ⟨x'⟩₀.
     Proof. now intros H1 H2%H1%E'_D'_leaf. Qed.
 
     (* Hence leaves ⟨_⟩₀ are not exceptional *)
@@ -369,7 +370,7 @@ Section af_utree_nodes.
     Proof. now intros (? & ? & ? & _)%(@E_D'_leaf ⦗x⦘₁)%disapointing_inv; auto. Qed.
  
     (* If ⟨⦗y,_⦘₂⟩₀ is a disapointing leaf with T α y then its evaluation embeds ⟨α|τ⟩₁ *)
-    Local Fact D'_leaf_embed y t : D' c ⟨⦗y,t⦘₂⟩₀ → T α y → ⟨α|τ⟩₁ ≼ ⟨y|t⟩₁.
+    Local Fact D'_leaf_embed y t : D' c₀ ⟨⦗y,t⦘₂⟩₀ → T α y → ⟨α|τ⟩₁ ≼ ⟨y|t⟩₁.
     Proof. intros (? & ? & [=] & Ht)%disapointing_inv Hy; subst; auto with utree_db. Qed.
 
     Hint Resolve D'_leaf_embed : core.
@@ -383,8 +384,8 @@ Section af_utree_nodes.
     (* E hereditary property *)
     Local Fact E_hereditary y' s t :
             E t
-          → (∀s', ana c s s' → ana c t ⟨y'|s'⟩₁)
-          → E s ∨ ∃s', ana c s s' ∧ D' c ⟨y'|s'⟩₁.
+          → (∀s', ana c₀ s s' → ana c₀ t ⟨y'|s'⟩₁)
+          → E s ∨ ∃s', ana c₀ s s' ∧ D' c₀ ⟨y'|s'⟩₁.
     Proof.
       intros H1 H2.
       apply fin_choice; auto.
@@ -409,8 +410,8 @@ Section af_utree_nodes.
       induction t as [ x | y t IHt ]; intros Ht.
       + (* leaves are not exceptional *)
         apply E_leaf_False in Ht as [].
-      + generalize af_choice_sT_spec E_hereditary E_node_embed.
-        destruct c; intros -> EH Ene.
+      + generalize Hc₀ E_hereditary E_node_embed.
+        destruct c₀; intros -> EH Ene.
         * (* if c = ◩, nodes *)
           destruct (EH y t _ Ht) as [ | (t' & H1 & H2) ]; eauto with utree_db.
           - now intros ? <-.
@@ -450,27 +451,27 @@ Section af_utree_nodes.
     Qed.
 
     Let sR' := (Some ◩).
-    Let sT' := match c with ◩ => Some ◩ | ▣ => None end.
+    Let sT' := match c₀ with ◩ => Some ◩ | ▣ => None end.
 
     Local Fact correct_R' : ⟪sR',X',R'⟫ₐ.
     Proof. exact R'_af. Qed.
 
-    Local Fact correct_T' : ⟪sT',Y' c,T' c⟫ₐ.
+    Local Fact correct_T' : ⟪sT',Y' c₀,T' c₀⟫ₐ.
     Proof.
-      unfold sT'; destruct c; simpl; try easy.
+      unfold sT'; destruct c₀; simpl; try easy.
       apply af_inv, T_af.
     Qed.
 
-    Local Fact RT'_lesser_RT : ⟪sR',X',R'|sT',Y' c,T' c⟫ ≺₂ ⟪sR,X,R|sT,Y,T⟫.
+    Local Fact RT'_lesser_RT : ⟪sR',X',R'|sT',Y' c₀,T' c₀⟫ ≺₂ ⟪sR,X,R|sT,Y,T⟫.
     Proof.
       generalize af_choice_sT_spec; intros Hc.
       unfold sT'; constructor 1; rewrite Hc.
-      destruct c; simpl; constructor.
+      destruct c₀; simpl; constructor.
     Qed.
 
     Hint Resolve correct_R' correct_T' RT'_lesser_RT : core.
 
-    Local Lemma RT'_af : af (utree_embed R' (T' c)).
+    Local Lemma RT'_af : af (utree_embed R' (T' c₀)).
     Proof. apply IHRT with (sR' := sR') (sT' := sT'); auto. Qed.
 
   End RT'_af.
@@ -480,7 +481,7 @@ Section af_utree_nodes.
   Theorem af_utree_nodes : af (utree_embed R T)↑⟨α|τ⟩₁.
   Proof.
     generalize RT'_af.
-    af quasi morph fun (hev c) (E' c); eauto.
+    af quasi morph fun (hev c₀) (E' c₀); eauto.
   Qed.
 
 End af_utree_nodes.
