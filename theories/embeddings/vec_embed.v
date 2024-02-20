@@ -110,7 +110,7 @@ Section vec_embed.
 
     | vec_embed_skip n (v : vec _ n) m y (w : vec _ m) :
                                    v ≤ₑ w
-                                →  v ≤ₑ y##w
+                             →     v ≤ₑ y##w
 
   where "v ≤ₑ w" := (@vec_embed _ v _ w).
 
@@ -126,14 +126,15 @@ Section vec_embed.
 
   Hint Resolve vec_embed_nil_any : core.
 
-  Fact vec_embed_length n (v : vec _ n) m (w : vec _ m) : v ≤ₑ w → n <= m.
+  Fact vec_embed_length n (v : vec _ n) m (w : vec _ m) : v ≤ₑ w → n ≤ m.
   Proof. induction 1; simpl; lia. Qed.
 
   Fact vec_embed_inv_left n (v : vec _ n) m (w : vec _ m) :
            v ≤ₑ w
          → match v with
            | ∅     => True
-           | x##v' => match w with
+           | x##v' =>
+             match w with
              | ∅     => False
              | y##w' => R x y ∧ v' ≤ₑ w' ∨ v ≤ₑ w'
              end
@@ -237,9 +238,9 @@ Fact vec_embed_compose X Y Z (R : X → Y → Prop) (T : Y → Z → Prop) n (u 
 Proof.
   intros H1 H2; revert H2 n u H1.
   induction 1 as [ | m y v p z w H1 H2 IH2
-                   | m v p z w H1 IH2 ]; intros n u Hu.
-  + apply vec_embed_inv_right in Hu; now destruct u; eauto with vec_db.
-  + apply vec_embed_inv_right in Hu as [|Hu].
+                   | m v p z w H1 IH2 ]; intros n u.
+  + intros ?%vec_embed_inv_right; now destruct u; eauto with vec_db.
+  + intros [|Hu]%vec_embed_inv_right.
     * constructor 3; eauto.
     * destruct u.
       - apply vec_embed_nil_any.
@@ -312,15 +313,15 @@ End vec_embed_sub_vec.
 Section vec_embed_disj_inv_gen.
 
   Variable (X₁ X₂ Y₁ Y₂ : Type)
-           (P : X₁ → Y₁ → Prop)
-           (Q : X₂ → Y₂ → Prop)
+           (f : X₁ → Y₁ → Prop)
+           (g : X₂ → Y₂ → Prop)
            (R : Y₁ → Y₂ → Prop)
            (T : X₁ → X₂ → Y₁ → Y₂ → Prop).
 
   Fact vec_fall2_disj_inv_gen n (u u' : vec _ n) v v' :
-        vec_fall2 (λ x x', ∀ y y', P x y → Q x' y' → R y y' ∨ T x x' y y') u v
-      → vec_fall2 P u u'
-      → vec_fall2 Q v v'
+        vec_fall2 (λ x x', ∀ y y', f x y → g x' y' → R y y' ∨ T x x' y y') u v
+      → vec_fall2 f u u'
+      → vec_fall2 g v v'
       → vec_fall2 R u' v' ∨ ∃ i j, T u⦃i⦄ v⦃j⦄ u'⦃i⦄ v'⦃j⦄.
   Proof.
     induction 1 as [ | n x u y v H1 H2 IH2 ] using vec_fall2_rect; intros G1 G2; auto with vec_db.
@@ -334,9 +335,9 @@ Section vec_embed_disj_inv_gen.
   Qed.
 
   Fact vec_embed_disj_inv_gen n (u u' : vec _ n) m (v v' : vec _ m) :
-        vec_embed (λ x x', ∀y y', P x y → Q x' y' → R y y' ∨ T x x' y y') u v
-      → vec_fall2 P u u'
-      → vec_fall2 Q v v'
+        vec_embed (λ x x', ∀y y', f x y → g x' y' → R y y' ∨ T x x' y y') u v
+      → vec_fall2 f u u'
+      → vec_fall2 g v v'
       → vec_embed R u' v' ∨ ∃ i j, T u⦃i⦄ v⦃j⦄ u'⦃i⦄ v'⦃j⦄.
   Proof.
     induction 1 as [ | n x u m y v H1 H2 IH2
@@ -378,7 +379,7 @@ Fact vec_embed_disj_inv' X Y (R T : X → Y → Prop) n (u : vec _ n) m (v : vec
 Proof.
   intros H.
   apply vec_embed_disj_inv with (P := eq) (Q := eq) (u := u) (v := v).
-  2,3: intro; auto.
+  2,3: red; auto.
   revert H; apply vec_embed_mono; intros; subst; auto.
 Qed.
 
@@ -389,15 +390,15 @@ Proof. intros H; apply vec_embed_disj_inv' in H as [ | (? & _ & ?) ]; eauto. Qed
 Section vec_fall2_embed_disj_special.
 
   Variables (X₁ X₂ Y₁ Y₂ : Type)
-            (P : X₁ → Y₁ → Prop)
-            (Q : X₂ → Y₂ → Prop)
+            (f : X₁ → Y₁ → Prop)
+            (g : X₂ → Y₂ → Prop)
             (R : Y₁ → Y₂ → Prop)
             (T : X₁ → Prop).
 
   Fact vec_fall2_disj_special n (u u' : vec _ n) v v' :
-        vec_fall2 (λ x x', ∀ y y', P x y → Q x' y' → R y y' ∨ T x) u v
-      → vec_fall2 P u u'
-      → vec_fall2 Q v v'
+        vec_fall2 (λ x x', ∀ y y', f x y → g x' y' → R y y' ∨ T x) u v
+      → vec_fall2 f u u'
+      → vec_fall2 g v v'
       → vec_fall2 R u' v' ∨ ∃i, T u⦃i⦄.
   Proof.
     intros HR HP HQ.
@@ -408,9 +409,9 @@ Section vec_fall2_embed_disj_special.
   Qed.
 
   Fact vec_embed_disj_special n (u u' : vec _ n) m (v v' : vec _ m) :
-        vec_embed (λ x x', ∀ y y', P x y → Q x' y' → R y y' ∨ T x) u v
-      → vec_fall2 P u u'
-      → vec_fall2 Q v v'
+        vec_embed (λ x x', ∀ y y', f x y → g x' y' → R y y' ∨ T x) u v
+      → vec_fall2 f u u'
+      → vec_fall2 g v v'
       → vec_embed R u' v' ∨ ∃i, T u⦃i⦄.
   Proof.
     intros HR HP HQ.

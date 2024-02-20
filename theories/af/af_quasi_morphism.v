@@ -28,8 +28,7 @@ Section af_quasi_morphism.
 
   Notation ana_rel := (λ y x, ev x = y).
 
-  Variables
-            (* ev has finite inverse images *)
+  Variables (* ev has finite inverse images *)
             (ana_fin : ∀y, fin (ana_rel y))
 
             (R : rel₂ X) (* abstracts the src embedding, eg higman' *)
@@ -41,7 +40,7 @@ Section af_quasi_morphism.
             (* ev is a "quasi" morphism from R to T, ie. "up to" E *)
             (ev_qmorph : ∀ x₁ x₂, R x₁ x₂ → T (ev x₁) (ev x₂) ∨ E x₁)
 
-            (* if no analysis of y avoids E then y must T-embed y0 *)
+            (* if every analysis of y is exceptional then y must T-embed y0 *)
             (HET : ∀y, ana_rel y ⊆₁ E → T y₀ y).
 
             (** We want to conclude: af R → af T↑y₀ *)
@@ -67,7 +66,7 @@ Section af_quasi_morphism.
          good R lx → good T (map ev lx) ∨ (λ x, x ∈ lx) ⧫ E.
   Proof.
     induction 1 as [ t2' t1' l H1 H2 | t1' l H IH ]; simpl.
-    + destruct (ev_qmorph H2); eauto.
+    + destruct ev_qmorph with (1 := H2); eauto.
     + destruct IH as [ | (? & ? & ?) ]; simpl; eauto.
   Qed.
 
@@ -91,10 +90,10 @@ Section af_quasi_morphism.
   Proof.
     intros Hm; red in Hm.
     destruct list_combi_principle
-      with (P := fun l => good T (map ev l))
+      with (P := λ l, good T (map ev l))
            (B := E)
            (ll := map ana ly)
-      as [ (lc & H1 & H2) | (a & H1 & H2) ].
+      as [ (lx & H1 & H2) | (a & H1 & H2) ].
 
     + (* Hypothesis for combi principle *)
       intros lx Hlx.
@@ -105,19 +104,20 @@ Section af_quasi_morphism.
     + (* there is (choice) sequence of analyses lx of ly which maps
          to a good sequence, but lx maps to ly hence ly is good *)
       apply Forall2_analysis_eq in H1 as <-.
-      apply good_app_right; auto.
+      now apply good_app_right.
 
     + (* there is an evaluation in ly of which all analyses are exceptional *)
-      apply in_map_iff in H1 as (y & <- & H3).
+      apply in_map_iff in H1 as (y & <- & H1).
       apply good_snoc with y; auto.
       apply HET.
-      intro; rewrite ana_spec; auto.
+      now intros ? ?%ana_spec%H2.
   Qed.
 
-  Hint Resolve AW_good_snoc : core.
-
   Local Corollary bar_AW_good_snoc ly : bar AW ly → bar (good T) (ly++[y₀]).
-  Proof. induction 1; auto. Qed.
+  Proof.
+    intros H; apply bar_app; revert H.
+    apply bar_mono, AW_good_snoc.
+  Qed.
 
   Hypothesis (HR : af R).
 
@@ -125,16 +125,14 @@ Section af_quasi_morphism.
   Local Fact bar_goodR_nil : bar (good R) [].
   Proof. apply af_iff_bar_good_nil; auto. Qed.
 
-  Hint Resolve bar_goodR_nil : core.
-
   (* By the FAN theorem, since R is af,
      all sequences will uniformly AW *)
   Local Fact bar_AW_nil : bar AW [].
   Proof.
     apply bar_map_inv
       with (f := ana)
-           (Q := fun ll => Forall (good R) (list_fan ll)); auto.
-    simpl; apply fan_on_list; auto.
+           (Q := λ ll, Forall (good R) (list_fan ll)); auto.
+    exact (fan_on_list (@good_skip _ R) bar_goodR_nil).
   Qed.
 
   Theorem af_quasi_morph_fun : af T↑y₀.
