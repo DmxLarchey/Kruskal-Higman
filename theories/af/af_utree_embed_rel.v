@@ -4,7 +4,7 @@
 (*                             [*] Affiliation LORIA -- CNRS  *)
 (**************************************************************)
 (*      This file is distributed under the terms of the       *)
-(*         CeCILL v2 FREE SOFTWARE LICENSE AGREEMENT          *)
+(*        Mozilla Public License Version 2.0, MPL-2.0         *)
 (**************************************************************)
 
 From Coq
@@ -27,27 +27,25 @@ Set Implicit Arguments.
 
 Section af_utree_nodes_rel.
 
-  (** The proof here mimics (ie downgrades) the proof of Higman's theorem
-      using an evaluation relation, not a function *)
-
-  Variables (sR : _) (X : Type) (R : rel₂ X) (sT : _) (Y : Type) (T : rel₂ Y)
-            (HR : ⟪sR,X,R⟫ₐ) (HT : ⟪sT,Y,T⟫ₐ)
-            (IHRT : ∀ sR' X' R' sT' Y' T',
-                        ⟪sR',X',R'⟫ₐ
-                      → ⟪sT',Y',T'⟫ₐ
-                      → ⟪sR',X',R'|sT',Y',T'⟫ ≺₂ ⟪sR,X,R|sT,Y,T⟫
-                      → af (utree_embed R' T'))
-
-            (α : Y) (τ : utree X Y)
-            (IHτ : af (utree_embed R T)↑τ).
-
   Notation "▣" := af_choice_full.
   Notation "◩" := af_choice_af.
 
-  Infix "≤ₑ" := (utree_embed R T) (at level 70).
+  (** This proof take the one in "af_utree_embed_fun.v"
+      as a reference but modifies it by using
+      an evaluation relation instead of an
+      evaluation map/function.
 
-  Notation sR' := (Some ◩) (only parsing).
-  Notation X' := (X+Y*utree X Y)%type.
+      It is only commented wrt the difference with
+      the reference one over graph vs function.
+
+      For detailed comments about how the proof works,
+      refer to the reference one *)
+
+  Variables (sR : _) (X : _) (R : rel₂ _) (HR : ⟪sR,X,R⟫ₐ)
+            (sT : _) (Y : _) (T : rel₂ _) (HT : ⟪sT,Y,T⟫ₐ)
+            (α : Y) (τ : utree X Y).
+
+  Let X' := (X+Y*utree X Y)%type.
 
   Notation "⦗ x ⦘₁" := (inl x) (at level 1, format "⦗ x ⦘₁").
   Notation "⦗ y , t ⦘₂" := (inr (y,t)) (at level 1, format "⦗ y , t ⦘₂").
@@ -61,9 +59,9 @@ Section af_utree_nodes_rel.
             → (utree_embed R T)↑τ s t
             → hig_rel_leaves ⦗u,s⦘₂ ⦗v,t⦘₂.
 
-  Notation R' := hig_rel_leaves.
+  Hint Constructors hig_rel_leaves : core.
 
-  Hint Constructors R' : core.
+  Notation R' := hig_rel_leaves.
 
   Local Fact hig_rel_leaves_inv x1' x2' :
            R' x1' x2'
@@ -78,25 +76,25 @@ Section af_utree_nodes_rel.
     + revert x1' x2'; intros [ | [] ] [ | [] ]; auto; intros []; eauto.
   Qed.
 
-  Local Definition Y' c :=
+  Let Y' c :=
     match c with
     | ◩ => Y
     | ▣ => Empty_set
     end.
 
-  Local Definition T' c : rel₂ (Y' c) :=
+  Let T' c : rel₂ (Y' c) :=
     match c return rel₂ (Y' c) with
     | ◩ => T↑α
     | ▣ => ⊥₂
     end.
 
-  Infix "≤ₐ" := (utree_embed R' (T' _)) (at level 70).
-
-  (* The evaluation map that unpacks compound nodes, described as a relation
-     (ie a graph), not as a (Coq) function *)
+  Infix "≼" := (utree_embed R T) (at level 70).
+  Notation "r '≼[' c ']' t" := (utree_embed R' (T' c) r t) (at level 70, format "r  ≼[ c ]  t").
 
   Reserved Notation "a '-[' c ']->' b" (at level 70, format "a  -[ c ]->  b").
 
+  (* The evaluation map that unpacks compound nodes, described as a relation
+     (ie a graph), not as a (Coq) function *)
   Inductive hev_graph : ∀c, utree X' (Y' c) → utree X Y → Prop :=
     | in_hev_graph_0 c x :       ⟨⦗x⦘₁⟩₀   -[c]-> ⟨x⟩₀
     | in_hev_graph_1 c y t :     ⟨⦗y,t⦘₂⟩₀ -[c]-> ⟨y|t⟩₁
@@ -113,7 +111,7 @@ Section af_utree_nodes_rel.
         can be somewhat tricky to write down so that they properly type,
         eg see dependent pattern matching below *)
 
-    Local Lemma hev_graph_left_inv c t' t :
+    Local Fact hev_graph_left_inv c t' t :
          t' -[c]-> t
        ↔ match t' with
          | ⟨⦗x⦘₁⟩₀   => t = ⟨x⟩₀
@@ -133,7 +131,7 @@ Section af_utree_nodes_rel.
         intros (? & -> & ?); auto.
     Qed.
 
-    Local Lemma hev_graph_right_inv c t' t :
+    Local Fact hev_graph_right_inv c t' t :
           t' -[c]-> t
         ↔ match c, t return utree X' (Y' c) → Prop with
           | ▣, ⟨x⟩₀   => λ t', t' = ⟨⦗x⦘₁⟩₀
@@ -166,7 +164,6 @@ Section af_utree_nodes_rel.
     end.
 
   (* The graph describes a functional and strongly total relation *)
-
   Local Lemma hev_graph_fun c t' t₁ t₂ : t' -[c]-> t₁ → t' -[c]-> t₂ → t₁ = t₂.
   Proof.
     intros H; revert H t₂.
@@ -184,7 +181,6 @@ Section af_utree_nodes_rel.
       * destruct y.
   Qed.
 
-  (* Ana(lysis) is the converse of evaluation *)
   Notation ana c := (λ t t', t' -[c]-> t).
 
   Section analysis_cases.
@@ -193,7 +189,7 @@ Section af_utree_nodes_rel.
         ana c ⟨x⟩₀ t' ↔ ⟨⦗x⦘₁⟩₀ = t'.
     Proof.
       split.
-      + intros H; apply hev_graph_right_inv in H; destruct c; easy.
+      + intros ?%hev_graph_right_inv; now destruct c.
       + intros <-; auto.
     Qed.
 
@@ -201,7 +197,7 @@ Section af_utree_nodes_rel.
         ana ▣ ⟨y|t⟩₁ t' ↔ ⟨⦗y,t⦘₂⟩₀ = t'.
     Proof.
       split.
-      + intros H; apply hev_graph_right_inv in H; easy.
+      + now intros ?%hev_graph_right_inv.
       + intros <-; auto.
     Qed.
 
@@ -210,14 +206,13 @@ Section af_utree_nodes_rel.
                          ∨ ∃t'', ⟨y|t''⟩₁ = t' ∧ ana ◩ t t''.
     Proof.
       split.
-      + intros H; apply hev_graph_right_inv in H; firstorder.
-      + intros [ <- | (t'' & <- & ?) ]; auto.
+      + intros ?%hev_graph_right_inv; firstorder.
+      + intros [ <- | (? & <- & ?) ]; auto.
     Qed.
 
   End analysis_cases.
 
   (* The reverse of the evaluation graph (ie the analysis) is finitary *)
-
   Local Lemma hev_graph_inv_fin c t : fin (ana c t).
   Proof.
     induction t as [ x | y t IHt ].
@@ -227,23 +222,18 @@ Section af_utree_nodes_rel.
       * finite eq (analysis_node_full _ _).
   Qed.
 
-  (** Remember than ⟨α|τ⟩₁ is the tree by which (utree_embed R T) is lifted
-      An analysis in utree X' (Y' c) is disappointing
-         1) if its root node is >= α (only when c = ◩, otherwise Y' ▣ is empty)
-      or 2) if it is a leaf and the label embeds τ
-    *)
-  Inductive disapointing_ana : forall c, utree X' (Y' c) -> Prop :=
-    | disapointing_ana_cons y t : T α y → disapointing_ana ◩ ⟨y|t⟩₁
-    | disapointing_ana_nest c y t : τ ≤ₑ t → disapointing_ana c ⟨⦗y,t⦘₂⟩₀.
+  Inductive disapointing : ∀c, utree X' (Y' c) → Prop :=
+    | disapointing_cons y t :   T α y → disapointing ◩ ⟨y|t⟩₁
+    | disapointing_nest c y t : τ ≼ t → disapointing c ⟨⦗y,t⦘₂⟩₀.
 
-  Notation D' := disapointing_ana.
+  Notation D' := disapointing.
 
-  Hint Constructors disapointing_ana : core.
+  Hint Constructors disapointing : core.
 
-  Fact disapointing_ana_inv c t' :
+  Fact disapointing_inv c t' :
            D' c t'
          ↔ match t' with
-           | ⟨x'⟩₀  => ∃ y t, x' = ⦗y,t⦘₂ ∧ τ ≤ₑ t
+           | ⟨x'⟩₀  => ∃ y t, x' = ⦗y,t⦘₂ ∧ τ ≼ t
            | ⟨y|_⟩₁ =>
              match c return Y' c → Prop with
              | ◩ => T α
@@ -259,42 +249,102 @@ Section af_utree_nodes_rel.
       * destruct c; auto; tauto.
   Qed.
 
-  (* An analysis is exceptional is one of its sub-trees in disapointing *)
-  Local Definition exceptional_ana c t := (λ s, s ≤ut t) ⧫ D' c.
+  Local Definition has_disapointing c t := (λ s, s ≤ut t) ⧫ D' c.
 
-  Notation E' := exceptional_ana.
+  Notation E' := has_disapointing.
 
-  Local Fact disap_ana_excep_ana c : D' c ⊆₁ E' c.
+  Local Fact disap_has_disap c : D' c ⊆₁ E' c.
   Proof. intros t; exists t; auto with utree_db. Qed.
 
-  Local Fact sub_utree_excep_ana c s t : s ≤ut t → E' c s → E' c t.
+  Local Fact sub_utree_has_disap c s t : s ≤ut t → E' c s → E' c t.
   Proof. intros ? (w & ? & ?); exists w; eauto with utree_db. Qed.
 
   Hint Resolve hev_graph_inv_fin
-               disap_ana_excep_ana
-               sub_utree_excep_ana : core.
+               disap_has_disap
+               sub_utree_has_disap : core.
 
   (* By induction on the utree_embed predicate and
      then left inversion on -[c]->, and also on R' *)
   Local Lemma hev_quasi_morphism c t1' t2' t1 t2 :
-         t1' ≤ₐ t2'
+         t1' ≼[c] t2'
        → t1' -[c]-> t1
        → t2' -[c]-> t2
-       → t1 ≤ₑ t2 ∨ E' c t1'.
+       → t1 ≼ t2 ∨ E' c t1'.
   Proof.
     intros H1 H2 H3; revert H1 t1 t2 H2 H3.
     induction 1 as [ x1 x2 H1
                    |    t1' y2 t2' H1 IH1
                    | y1 t1' y2 t2' H1 H2 IH2 ]; intros t1 t2 G1 G2.
-    + induction H1 as [ | ? ? ? ? ? [] ];
+    + destruct H1 as [ | ? ? ? ? ? [] ];
         hev left inv G1; hev left inv G2; auto with utree_db.
     + hev left inv G2.
-      specialize (IH1 _ _ G1 G2).
-      revert IH1; intros []; auto with utree_db.
+      destruct (IH1 _ _ G1 G2); auto with utree_db.
     + hev left inv G1; hev left inv G2.
       specialize (IH2 _ _ G1 G2).
       revert H1 IH2; intros [] []; eauto with utree_db.
   Qed.
+
+  Notation E c t := (ana c t ⊆₁ E' c).
+
+  Section exceptional_vs_embedding.
+
+    Local Remark embed_exceptional c t : ⟨α|τ⟩₁ ≼ t → E c t.
+    Proof.
+      intros H t' Ht'; revert Ht' H; simpl.
+      induction 1 as [ c x | c y t | y s t H IH ].
+      + now intros ?%utree_embed_inv_10.
+      + intros [ | [] ]%utree_embed_inv_11;
+          exists ⟨⦗y,t⦘₂⟩₀; eauto with utree_db.
+      + intros [ (v & [])%IH | [] ]%utree_embed_inv_11.
+        * exists v; eauto with utree_db.
+        * exists ⟨y|s⟩₁; eauto with utree_db.
+    Qed.
+
+    Local Fact E'_D'_leaf c x' : E' c ⟨x'⟩₀ → D' c ⟨x'⟩₀.
+    Proof. now intros (? & [ -> | [] ]%sub_utree_inv_right & ?). Qed.
+
+    Local Fact E_D'_leaf c x' t : E c t → ana c t ⟨x'⟩₀ → D' c ⟨x'⟩₀.
+    Proof. now intros Ht (? & [ -> | [] ]%sub_utree_inv_right & Hs)%Ht. Qed.
+
+    Local Lemma E_leaf_False c x : E c ⟨x⟩₀ → False.
+    Proof. now intros (? & ? & ? & _)%(@E_D'_leaf _ ⦗x⦘₁)%disapointing_inv; auto. Qed.
+
+    Local Fact D'_leaf_embed c y t : D' c ⟨⦗y,t⦘₂⟩₀ → T α y → ⟨α|τ⟩₁ ≼ ⟨y|t⟩₁.
+    Proof. intros (? & ? & [=] & Ht)%disapointing_inv Hy; subst; auto with utree_db. Qed.
+
+    Hint Resolve D'_leaf_embed : core.
+
+    Local Fact E_node_embed c y t : E c ⟨y|t⟩₁ → T α y → ⟨α|τ⟩₁ ≼ ⟨y|t⟩₁.
+    Proof. intros Ht%(@E_D'_leaf _ ⦗y,t⦘₂) H; eauto. Qed.
+
+    Local Fact E_hereditary c y s t :
+          E c t
+        → (∀ s', ana c s s' → ana c t ⟨y|s'⟩₁)
+        → E c s
+        ∨ ana c s ⧫ λ s', D' c ⟨y|s'⟩₁.
+    Proof.
+      intros Ht Hs.
+      apply fin_choice; auto; intros s' Hs'.
+      destruct (Ht _ (Hs _ Hs')) as (u & Hu & ?).
+      apply sub_utree_inv_right in Hu as [ -> | ]; eauto.
+    Qed.
+
+    Local Lemma E_embed c t : 
+          (c = ▣ → ∀ y₁ y₂, T y₁ y₂)
+        → E c t
+        → ⟨α|τ⟩₁ ≼ t.
+    Proof.
+      intros Hc.
+      induction t as [ x | y t IHt ]; intros Ht.
+      + apply E_leaf_False in Ht as [].
+      + destruct c.
+        * destruct (@E_hereditary ◩ y t _ Ht) as [ | (t' & H1 & H2) ]; eauto with utree_db.
+          apply disapointing_inv in H2.
+          apply (@E_node_embed ◩); auto.
+        * apply (@E_node_embed ▣); auto.
+    Qed.
+
+  End exceptional_vs_embedding.
 
   Section af_choice.
 
@@ -309,94 +359,30 @@ Section af_utree_nodes_rel.
   End af_choice.
 
   Notation c₀ := af_choice_sT.
-  Notation Hc₀ := af_choice_sT_spec.
+  Notation Hc₀ := af_choice_sT_spec. (* sT = Some c₀ *)
 
-  Section exceptional_vs_embed.
+  Local Lemma exceptional_embed t : E c₀ t → ⟨α|τ⟩₁ ≼ t.
+  Proof.
+    apply E_embed; intros E.
+    generalize HT.
+    rewrite Hc₀, E; trivial.
+  Qed.
 
-    (** An evaluation is exceptional if each of its analysis is exceptional *)
-    Notation E t := (ana c₀ t ⊆₁ E' c₀).
+  Local Remark exceptional_iff_embed t : E c₀ t ↔ ⟨α|τ⟩₁ ≼ t.
+  Proof. split; [ apply exceptional_embed | apply embed_exceptional ]. Qed.
 
-    (* If T α y then a disapointing leaf ⟨⦗y,t⦘₂⟩₀ must embed ⟨α|τ⟩₁ *)
-    Let D'_leaf_embed y t : T α y → D' c₀ ⟨⦗y,t⦘₂⟩₀ → ⟨α|τ⟩₁ ≤ₑ ⟨y|t⟩₁.
-    Proof.
-      intros Hy Ht.
-      apply disapointing_ana_inv in Ht as (? & ? & E & ?).
-      inversion E; subst; auto with utree_db.
-    Qed.
+  Hypotheses (IHτ : af (utree_embed R T)↑τ)
 
-    (* If an exceptional evaluation is analysed by
-       a leaf then this leaf must be disapointing *)
-    Let E_leaf x' t : E t → ana c₀ t ⟨x'⟩₀ → D' c₀ ⟨x'⟩₀.
-    Proof.
-      intros Ht Hx'.
-      apply Ht in Hx' as (s & Hx' & Hs).
-      apply sub_utree_inv_right in Hx' as [ -> | [] ]; auto.
-    Qed.
-
-    (* hence leaves ⟨_⟩₀ cannot be exceptional *)
-    Let not_E_leaf x : ¬ E ⟨x⟩₀.
-    Proof.
-      intros H.
-      apply E_leaf with (x' := ⦗x⦘₁) in H; auto.
-      now apply disapointing_ana_inv in H as (? & ? & ? & _).
-    Qed.
-
-    (* If a node ⟨y|t⟩₁ is exceptional and y embed α
-       then ⟨y|t⟩₁ embeds ⟨α|τ⟩₁ *)
-    Let E_node_embed y t : E ⟨y|t⟩₁ → T α y → ⟨α|τ⟩₁ ≤ₑ ⟨y|t⟩₁.
-    Proof.
-      intros Ht Hy.
-      apply (@E_leaf ⦗y,t⦘₂) in Ht.
-      + apply D'_leaf_embed; assumption.
-      + constructor.
-    Qed.
-
-    (* How to call this: hereditary property ?? *)
-    Let E_hereditary y s t :
-                      E t
-                    → (∀ s', ana c₀ s s' → ana c₀ t ⟨y|s'⟩₁)
-                    → E s
-                    ∨ ana c₀ s ⧫ λ s', D' c₀ ⟨y|s'⟩₁.
-    Proof.
-      intros Ht Hs.
-      apply fin_choice; auto; intros s' Hs'.
-      destruct (Ht _ (Hs _ Hs')) as (u & Hu & ?).
-      apply sub_utree_inv_right in Hu as [ -> | ].
-      + right; auto.
-      + left; now exists u.
-    Qed.
-
-    (** This property is similar to
-             1) intercalate_any_vec_fall2
-         and 2) intercalate_any_vec_embed
-     *)
-    Local Lemma E_embed t : E t → ⟨α|τ⟩₁ ≤ₑ t.
-    Proof.
-      generalize Hc₀; intros Hc₀.
-      induction t as [ x | y t IHt ]; intros Ht.
-      + now apply not_E_leaf in Ht.
-      + destruct c₀.
-        * (* if c = ◩, nodes *)
-          destruct (@E_hereditary y t)
-            with (1 := Ht)
-            as [ | (t' & ? & Dt') ];
-            auto with utree_db.
-          apply disapointing_ana_inv in Dt'.
-          now apply E_node_embed.
-        * (* if c = ▣, T is full *)
-          rewrite Hc₀ in HT; simpl in HT.
-          now apply E_node_embed.
-    Qed.
-
-  End exceptional_vs_embed.
+             (IHRT : ∀ sR' X' R' sT' Y' T',
+                        ⟪sR',X',R'⟫ₐ
+                      → ⟪sT',Y',T'⟫ₐ
+                      → ⟪sR',X',R'|sT',Y',T'⟫ ≺₂ ⟪sR,X,R|sT,Y,T⟫
+                      → af (utree_embed R' T')).
 
   Section RT'_af.
 
-    Local Fact R_af : af R.
-    Proof. now apply wrel₂_accepted_af in HR. Qed.
-
-    Local Fact T_af : af T.
-    Proof. now apply wrel₂_accepted_af in HT. Qed.
+    Local Fact R_af : af R.  Proof. now apply wrel₂_accepted_af in HR. Qed.
+    Local Fact T_af : af T.  Proof. now apply wrel₂_accepted_af in HT. Qed.
 
     Local Fact R'_af : af R'.
     Proof.
@@ -406,18 +392,16 @@ Section af_utree_nodes_rel.
       intros []; auto.
     Qed.
 
-    Let sT' :=
-      match c₀ with
-        | ◩ => Some ◩
-        | ▣ => None
-      end.
+    Let sR' := (Some ◩).
+    Let sT' := match c₀ with ◩ => Some ◩ | ▣ => None end.
 
-    Hint Resolve R'_af T_af : core.
+    Local Fact correct_R' : ⟪sR',X',R'⟫ₐ.
+    Proof. exact R'_af. Qed.
 
-    Local Fact T'_correct : ⟪sT',Y' c₀,T' c₀⟫ₐ.
+    Local Fact correct_T' : ⟪sT',Y' c₀,T' c₀⟫ₐ.
     Proof.
       unfold sT'; destruct c₀; simpl; try easy.
-      apply af_inv; auto.
+      apply af_inv, T_af.
     Qed.
 
     Local Fact RT'_lesser_RT : ⟪Some ◩,X',R'|sT',Y' c₀,T' c₀⟫ ≺₂ ⟪sR,X,R|sT,Y,T⟫.
@@ -426,20 +410,17 @@ Section af_utree_nodes_rel.
       destruct c₀; simpl; constructor.
     Qed.
 
-    Hint Resolve RT'_lesser_RT : core.
+    Hint Resolve correct_R' correct_T' RT'_lesser_RT : core.
 
     Local Lemma RT'_af : af (utree_embed R' (T' c₀)).
-    Proof. 
-      apply IHRT with (sR' := sR') (sT' := sT'); simpl; auto.
-      apply T'_correct.
-    Qed.
+    Proof. eapply IHRT; eauto. Qed.
 
   End RT'_af.
 
   Hint Resolve hev_graph_total
                hev_graph_fun
                hev_quasi_morphism
-               E_embed : core.
+               exceptional_embed : core.
 
   Theorem af_utree_nodes : af (utree_embed R T)↑⟨α|τ⟩₁.
   Proof.

@@ -28,6 +28,9 @@ Set Implicit Arguments.
 
 Section af_utree_nodes.
 
+  Notation "▣" := af_choice_full.
+  Notation "◩" := af_choice_af.
+
   (** The proof here mimics (ie downgrades) the proof of Higman's theorem
       and does it using functions as morphism, not relations, which leads
       to shorter code but less versatile when dealing with Σ-types,
@@ -43,32 +46,34 @@ Section af_utree_nodes.
 
       We want to show that (utree_embed R T)↑⟨α|τ⟩₁ is AF and
       for this, we use a quasi morphism defined below. See
-      af_quasi_morphism.v for a description of that tool. 
+      "af_quasi_morphism.v" for a description of that tool.
 
       We build a new type utree X' Y' equipped with an
       embedding utree_embed R' T' where the pair (R',T')
       has lesser AF complexity than (R,T). This is witnessed
       by a pair sR'/sT' which is lesser that sR/sT.
 
-      As a consequence of the induction hypothesis, utree_embed R' T' 
-      can then be assumed AF.
+      As a consequence of the induction hypothesis, utree_embed R' T'
+      can then be proved AF.
 
       Finally, the quasi morphism transports this AF property to
       (utree_embed R T)↑⟨α|τ⟩₁. *)
 
-  Notation "▣" := af_choice_full.
-  Notation "◩" := af_choice_af.
-
   Notation "⦗ x ⦘₁" := (inl x) (at level 1, format "⦗ x ⦘₁").
   Notation "⦗ y , t ⦘₂" := (inr (y,t)) (at level 1, format "⦗ y , t ⦘₂").
 
-  (* The new types of leaves X' and nodes Y'. Y' depends the value of 
-     the witness sT = Some c. sT = None os not possible because α inhabits Y. *)
+  (** The new types of leaves X' and nodes Y':
+       - X' := X + Y x utree X Y
+       - Y' depends the value of the witness sT = Some c
+       - c is a parameter that is related to sT quite late in the proof.
+      Remark that sT = None is not possible because α inhabits Y. *)
 
   Notation X' := (X+Y*utree X Y)%type.
 
   (* c := ◩ represents the situation where T on nodes of arity 1 is af
-     c := ▣ represents the situation where T on nodes of arity 1 if full *) 
+     c := ▣ represents the situation where T on nodes of arity 1 if full 
+
+     These two properties are only needed late in the proof. *) 
 
   Let Y' c := match c with ◩ => Y | ▣ => Empty_set end.
 
@@ -100,13 +105,10 @@ Section af_utree_nodes.
     + revert x1' x2'; intros [ | [] ] [ | [] ]; auto; intros []; eauto.
   Qed.
 
-  (* Again, the relation T' on Y' depends on c *)
-
-  Let T' c : rel₂ (Y' c) :=
-    match c return rel₂ (Y' c) with
-    | ◩ => T↑α
-    | ▣ => ⊥₂  (* anything works here because Y' ▣ is void *)
-    end.
+  (* Again, the relation T' on Y' depends on c.
+     Notice that anything works here because Y' ▣ is
+     an empty type. *)
+  Let T' c := match c return rel₂ (Y' c) with ◩ => T↑α | ▣ => ⊥₂ end.
 
   Infix "≼" := (utree_embed R T) (at level 70).
   Notation "r '≼[' c ']' t" := (utree_embed R' (T' c) r t) (at level 70, format "r  ≼[ c ]  t").
@@ -232,9 +234,10 @@ Section af_utree_nodes.
   (** The following property is all we need to know about the
       analysing process except that its converse is evalutation.
       In particular, we do not need to know the explicit form
-      of the "function". Actually the fin predicate is informative 
-      and contains that function but it is hidden in how the 
-      KruskalFinite tools compute finiteness. *)
+      of the "function". Actually the fin predicate is informative
+      and contains that function but it is hidden in how the
+      KruskalFinite tools compute finiteness, and it is much
+      better to keep it that way. *)
 
   (* ana(lysis) is finitary, ie the evaluation function has finite inverse image *)
   Local Lemma analysis_fin c t : fin (ana c t).
@@ -290,7 +293,7 @@ Section af_utree_nodes.
   Proof. intros ? t; exists t; auto with utree_db. Qed.
 
   Local Fact sub_utree_has_disap c s' t' : s' ≤ut t' → E' c s' → E' c t'.
-  Proof. intros ? (w & ? & ?); exists w; eauto with utree_db. Qed.
+  Proof. intros ? (w & []); exists w; eauto with utree_db. Qed.
 
   Hint Resolve disap_has_disap sub_utree_has_disap : core.
 
@@ -308,45 +311,26 @@ Section af_utree_nodes.
       destruct c; simpl in *; destruct H1; eauto with utree_db.
   Qed.
 
-  Section af_choice.
+  (** An analysis is exceptional (E') if it contains a disapointing sub-tree (D')
+      An evalutation is exceptional (E) if all its analyses are exceptional 
 
-    (* sT cannot be empty/▢ because α inhabits Y. *)
+      Below we show that exceptional evaluations are exactly those embedding ⟨α|τ⟩₁ *)
 
-    (* We freeze c st sT = Some c *)
-    Local Fact af_choice_sT_pwc : { c | sT = Some c }.
-    Proof. destruct sT; [ eauto | now simpl in HT ]. Qed.
-
-    Local Definition af_choice_sT := proj1_sig af_choice_sT_pwc.
-
-    Local Fact af_choice_sT_spec : sT = Some af_choice_sT.
-    Proof. apply (proj2_sig af_choice_sT_pwc). Qed.
-
-  End af_choice.
-
-  Notation c₀ := af_choice_sT.
-  Notation Hc₀ := af_choice_sT_spec.
+  Notation E c t := (ana c t ⊆₁ E' c).
 
   Section exceptional_vs_embedding.
 
-    (** An analysis is exceptional (E') if it contains a disapointing sub-tree (D')
-        An evalutation is exceptional (E) if all its analyses are exceptional 
-
-        Below we show that exceptional evaluations are exactly those embedding ⟨α|τ⟩₁ *)
-
-    (** First, it "t" embeds ⟨α|τ⟩₁ then it is exceptional, ie all its analyses
+    (** First, if "t" embeds ⟨α|τ⟩₁ then it is exceptional, ie all its analyses
         contain a disapointing sub-tree *)
 
-    (* Every analysis of t is exceptional *)
-    Notation E t := (ana c₀ t ⊆₁ E' c₀).
-
-    Local Remark embed_exceptional t : ⟨α|τ⟩₁ ≼ t → E t.
+    Local Remark embed_exceptional c t : ⟨α|τ⟩₁ ≼ t → E c t.
     Proof.
       intros H t' <-.
       induction t' as [ [ | (x2,t2) ] | y t' IH ]; simpl in H.
       + now apply utree_embed_inv_10 in H.
       + exists ⟨⦗x2,t2⦘₂⟩₀; split; eauto with utree_db.
         apply utree_embed_inv_11 in H as [ | [] ]; eauto with utree_db.
-      + destruct c₀; [ | destruct y ].
+      + destruct c; [ | destruct y ].
         apply utree_embed_inv_11 in H as [ (v & [])%IH | [] ].
         * exists v; eauto with utree_db.
         * exists ⟨y|t'⟩₁; eauto with utree_db.
@@ -358,19 +342,19 @@ Section af_utree_nodes.
     (** Let us first study exceptional leaves (of arity 0) *)
 
     (* A leaf (analysis) is exceptional only if it is disapointing *)
-    Local Fact E'_D'_leaf x' : E' c₀ ⟨x'⟩₀ → D' c₀ ⟨x'⟩₀.
+    Local Fact E'_D'_leaf c x' : E' c ⟨x'⟩₀ → D' c ⟨x'⟩₀.
     Proof. now intros (? & [ -> | [] ]%sub_utree_inv_right & ?). Qed.
  
     (* An evaluation of a leaf is exceptional only if this leaf is disapointing *)
-    Local Fact E_D'_leaf x' t : E t → ana c₀ t ⟨x'⟩₀ → D' c₀ ⟨x'⟩₀.
+    Local Fact E_D'_leaf c x' t : E c t → ana c t ⟨x'⟩₀ → D' c ⟨x'⟩₀.
     Proof. now intros H1 H2%H1%E'_D'_leaf. Qed.
 
     (* Hence leaves ⟨_⟩₀ are not exceptional *)
-    Local Lemma E_leaf_False x : E ⟨x⟩₀ → False.
-    Proof. now intros (? & ? & ? & _)%(@E_D'_leaf ⦗x⦘₁)%disapointing_inv; auto. Qed.
+    Local Lemma E_leaf_False c x : E c ⟨x⟩₀ → False.
+    Proof. now intros (? & ? & ? & _)%(@E_D'_leaf _ ⦗x⦘₁)%disapointing_inv; auto. Qed.
  
     (* If ⟨⦗y,_⦘₂⟩₀ is a disapointing leaf with T α y then its evaluation embeds ⟨α|τ⟩₁ *)
-    Local Fact D'_leaf_embed y t : D' c₀ ⟨⦗y,t⦘₂⟩₀ → T α y → ⟨α|τ⟩₁ ≼ ⟨y|t⟩₁.
+    Local Fact D'_leaf_embed c y t : D' c ⟨⦗y,t⦘₂⟩₀ → T α y → ⟨α|τ⟩₁ ≼ ⟨y|t⟩₁.
     Proof. intros (? & ? & [=] & Ht)%disapointing_inv Hy; subst; auto with utree_db. Qed.
 
     Hint Resolve D'_leaf_embed : core.
@@ -378,14 +362,14 @@ Section af_utree_nodes.
     (** Let us now study exceptional trees of arity 1 *)
 
     (* An exceptional evaluation ⟨y|_⟩₁ with T α y embeds ⟨α|τ⟩₁ *)
-    Local Fact E_node_embed y t : E ⟨y|t⟩₁ → T α y → ⟨α|τ⟩₁ ≼ ⟨y|t⟩₁.
-    Proof. intros Ht%(@E_D'_leaf ⦗y,t⦘₂) H; eauto. Qed.
+    Local Fact E_node_embed c y t : E c ⟨y|t⟩₁ → T α y → ⟨α|τ⟩₁ ≼ ⟨y|t⟩₁.
+    Proof. intros Ht%(@E_D'_leaf _ ⦗y,t⦘₂) H; eauto. Qed.
 
     (* E hereditary property *)
-    Local Fact E_hereditary y' s t :
-            E t
-          → (∀s', ana c₀ s s' → ana c₀ t ⟨y'|s'⟩₁)
-          → E s ∨ ∃s', ana c₀ s s' ∧ D' c₀ ⟨y'|s'⟩₁.
+    Local Fact E_hereditary c y' s t :
+            E c t
+          → (∀s', ana c s s' → ana c t ⟨y'|s'⟩₁)
+          → E c s ∨ ∃s', ana c s s' ∧ D' c ⟨y'|s'⟩₁.
     Proof.
       intros H1 H2.
       apply fin_choice; auto.
@@ -405,26 +389,55 @@ Section af_utree_nodes.
      *)
 
     (* If every analysis of t is exceptional that t embeds ⟨α|τ⟩₁ *)
-    Local Lemma exceptional_embed t : E t → ⟨α|τ⟩₁ ≼ t.
+    Local Lemma E_embed c t :
+          (c = ▣ → ∀ y₁ y₂, T y₁ y₂)
+        → E c t
+        → ⟨α|τ⟩₁ ≼ t.
     Proof.
+      intros Hc.
       induction t as [ x | y t IHt ]; intros Ht.
       + (* leaves are not exceptional *)
         apply E_leaf_False in Ht as [].
-      + generalize Hc₀ E_hereditary E_node_embed.
-        destruct c₀; intros -> EH Ene.
-        * (* if c = ◩, nodes *)
-          destruct (EH y t _ Ht) as [ | (t' & H1 & H2) ]; eauto with utree_db.
+      + destruct c.
+        * (* case c = ◩ *)
+          destruct (@E_hereditary ◩ y t _ Ht) as [ | (t' & H1 & H2) ]; eauto with utree_db.
           - now intros ? <-.
-          - apply disapointing_inv in H2; eauto.
-        * (* if c = ▣, T is full *)
-          simpl in HT.
-          apply Ene; [ apply Ht | apply HT ].
+          - apply disapointing_inv in H2.
+            apply (@E_node_embed ◩); auto.
+        * (* case c = ▣, T is full *)
+          apply (@E_node_embed ▣); auto.
     Qed.
 
-    Local Remark exceptional_iff_embed t : E t ↔ ⟨α|τ⟩₁ ≼ t.
-    Proof. split; [ apply exceptional_embed | apply embed_exceptional ]. Qed.
-
   End exceptional_vs_embedding.
+
+  Section af_choice.
+
+    (* sT cannot be empty/▢ because α inhabits Y. *)
+
+    (* We freeze c st sT = Some c *)
+    Local Fact af_choice_sT_pwc : { c | sT = Some c }.
+    Proof. destruct sT; [ eauto | now simpl in HT ]. Qed.
+
+    Local Definition af_choice_sT := proj1_sig af_choice_sT_pwc.
+
+    Local Fact af_choice_sT_spec : sT = Some af_choice_sT.
+    Proof. apply (proj2_sig af_choice_sT_pwc). Qed.
+
+  End af_choice.
+
+  Notation c₀ := af_choice_sT.
+  Notation Hc₀ := af_choice_sT_spec.  (* sT = Some c₀ *)
+
+  (* T is full when c₀ = ▣ *)
+  Local Theorem exceptional_embed t : E c₀ t → ⟨α|τ⟩₁ ≼ t.
+  Proof.
+    apply E_embed; intros E.
+    generalize HT.
+    rewrite Hc₀, E; trivial.
+  Qed.
+
+  Local Remark exceptional_iff_embed t : E c₀ t ↔ ⟨α|τ⟩₁ ≼ t.
+  Proof. split; [ apply exceptional_embed | apply embed_exceptional ]. Qed.
 
   Hypotheses (IHτ : af (utree_embed R T)↑τ)
 
@@ -436,11 +449,11 @@ Section af_utree_nodes.
 
   Section RT'_af.
 
-    Local Fact R_af : af R. Proof. now apply wrel₂_accepted_af in HR. Qed.
-    Local Fact T_af : af T. Proof. now apply wrel₂_accepted_af in HT. Qed.
+    Local Fact R_af : af R.  Proof. now apply wrel₂_accepted_af in HR. Qed.
+    Local Fact T_af : af T.  Proof. now apply wrel₂_accepted_af in HT. Qed.
 
-    (* Sum and product below by consequences of Ramsey's theorem,
-       ie af_sum and af_product *)
+    (* sum and product below by consequences of Ramsey's theorem,
+       ie the theorems "af_sum" and "af_product" *)
 
     Local Fact R'_af : af R'.
     Proof.
@@ -471,8 +484,8 @@ Section af_utree_nodes.
 
     Hint Resolve correct_R' correct_T' RT'_lesser_RT : core.
 
-    Local Lemma RT'_af : af (utree_embed R' (T' c₀)).
-    Proof. apply IHRT with (sR' := sR') (sT' := sT'); auto. Qed.
+    Local Theorem RT'_af : af (utree_embed R' (T' c₀)).
+    Proof. eapply IHRT; eauto. Qed.
 
   End RT'_af.
 
