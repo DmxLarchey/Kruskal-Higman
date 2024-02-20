@@ -23,6 +23,7 @@ af/af_lex.v
 af/af_quasi_morphism_decidable.v
 af/af_quasi_morphism.v
 af/af_utree_embed_fun.v
+af/af_utree_embed_rel.v
 af/af_utree_embed.v
 af/af_list_embed.v
 af/af_vec_embed.v

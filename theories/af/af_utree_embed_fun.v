@@ -480,7 +480,7 @@ Section af_utree_nodes.
   Theorem af_utree_nodes : af (utree_embed R T)↑⟨α|τ⟩₁.
   Proof.
     generalize RT'_af.
-    af quasi morph (hev c) (E' c); eauto.
+    af quasi morph fun (hev c) (E' c); eauto.
   Qed.
 
 End af_utree_nodes.

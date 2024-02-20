@@ -61,8 +61,9 @@ Section af_quasi_morphism.
 
   Hint Resolve in_map in_or_app in_cons in_eq : core.
 
-  (* If a list is R-good then its evaluation is T-good unless it meets E *)
-  Local Fact ev_good_or_E lx :
+  (* If a list is R-good then its evaluation is T-good unless it meets E 
+     This extends the ev_qmorph property to good sequences *)
+  Local Fact ev_good_or_exceptional lx :
          good R lx → good T (map ev lx) ∨ (λ x, x ∈ lx) ⧫ E.
   Proof.
     induction 1 as [ t2' t1' l H1 H2 | t1' l H IH ]; simpl.
@@ -99,7 +100,7 @@ Section af_quasi_morphism.
       intros lx Hlx.
       rewrite Forall_forall in Hm.
       apply list_fan_spec, Hm in Hlx.
-      now apply ev_good_or_E.
+      now apply ev_good_or_exceptional.
 
     + (* there is (choice) sequence of analyses lx of ly which maps
          to a good sequence, but lx maps to ly hence ly is good *)
@@ -136,7 +137,7 @@ Section af_quasi_morphism.
     simpl; apply fan_on_list; auto.
   Qed.
 
-  Theorem af_quasi_morphism : af T↑y₀.
+  Theorem af_quasi_morph_fun : af T↑y₀.
   Proof.
     apply af_iff_bar_good_nil,
           bar_rel_lift,
@@ -146,10 +147,54 @@ Section af_quasi_morphism.
 
 End af_quasi_morphism.
 
-Check af_quasi_morphism.
-
-Tactic Notation "af" "quasi" "morph" uconstr(f) uconstr(e) :=
+Tactic Notation "af" "quasi" "morph" "fun" uconstr(f) uconstr(e) :=
   match goal with
-    | |- af _ → af _ => apply af_quasi_morphism with (ev := f) (E := e)
+  | |- af _ → af _ => apply af_quasi_morph_fun with (ev := f) (E := e)
   end.
+
+Section af_quasi_morph.
+
+  Variables (X Y : Type) (ea_rel : X → Y → Prop).
+
+  Notation "x '⇝' y" := (ea_rel x y) (at level 70, no associativity, format "x ⇝ y").
+  Notation ana_rel := (λ y x, x⇝y).
+
+  Variables (ea_fun : ∀ x y₁ y₂, x⇝y₁ → x⇝y₂ → y₁ = y₂)
+            (ea_total : ∀ x, { y | x⇝y })
+            (ea_fin : ∀ y, fin (ana_rel y))
+            (R : rel₂ X) (E : rel₁ X)
+            (T : rel₂ Y) (y₀ : Y)
+            (HRT : ∀ x₁ x₂ y₁ y₂, R x₁ x₂ → x₁⇝y₁ → x₂⇝y₂ → T y₁ y₂ ∨ E x₁)
+            (HT : ∀ y, ana_rel y ⊆₁ E → T y₀ y).
+
+  Let ev' x := proj1_sig (ea_total x).
+
+  Local Fact ev'_spec x : x⇝ev' x.
+  Proof. apply (proj2_sig _). Qed.
+
+  Hint Resolve ev'_spec : core.
+
+ Theorem af_quasi_morph_rel : af R → af T↑y₀.
+  Proof.
+    af quasi morph fun ev' E.
+    + intros y.
+      destruct (ea_fin y) as (l & Hl).
+      exists l; intros x.
+      rewrite <- Hl; split.
+      * intros <-; auto.
+      * apply ea_fun; auto.
+    + intros x1 x2 []%(@HRT _ _ (ev' x1) (ev' x2)); auto.
+    + intros y Hy; apply HT.
+      intros x Hx; apply Hy.
+      revert Hx; apply ea_fun; auto.
+  Qed.
+
+End af_quasi_morph.
+
+Tactic Notation "af" "quasi" "morph" "rel" uconstr(f) uconstr(e) :=
+  match goal with
+  | |- af _ → af _ => apply af_quasi_morph_rel with (ea_rel := f) (E := e)
+  end.
+
+
 
