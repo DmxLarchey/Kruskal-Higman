@@ -309,18 +309,35 @@ End vec_embed_sub_vec.
 
 (* 𝕆𝕊 λ ∀∃ → ↔ ∧ ∨ *)
 
-Section vec_embed_disj_inv.
+Section vec_embed_disj_inv_gen.
 
   Variable (X₁ X₂ Y₁ Y₂ : Type)
            (P : X₁ → Y₁ → Prop)
            (Q : X₂ → Y₂ → Prop)
-           (R T : Y₁ → Y₂ → Prop).
+           (R : Y₁ → Y₂ → Prop)
+           (T : X₁ → X₂ → Y₁ → Y₂ → Prop).
 
-  Fact vec_embed_disj_inv n (u u' : vec _ n) m (v v' : vec _ m) :
-        vec_embed (λ x x', ∀y y', P x y → Q x' y' → R y y' ∨ T y y') u v
+  Fact vec_fall2_disj_inv_gen n (u u' : vec _ n) v v' :
+        vec_fall2 (λ x x', ∀ y y', P x y → Q x' y' → R y y' ∨ T x x' y y') u v
       → vec_fall2 P u u'
       → vec_fall2 Q v v'
-      → vec_embed R u' v' ∨ ∃ i j, T u'⦃i⦄ v'⦃j⦄.
+      → vec_fall2 R u' v' ∨ ∃ i j, T u⦃i⦄ v⦃j⦄ u'⦃i⦄ v'⦃j⦄.
+  Proof.
+    induction 1 as [ | n x u y v H1 H2 IH2 ] using vec_fall2_rect; intros G1 G2; auto with vec_db.
+    vec invert u' as x' u'; vec invert v' as y' v'.
+    apply vec_fall2_cons_inv in G2 as (G3 & G4).
+    apply vec_fall2_cons_inv in G1 as (G1 & G2).
+    destruct (H1 _ _ G1 G3) as [ F0 | F0 ].
+    + destruct (IH2 _ _ G2 G4) as [ F | (p & q & F) ]; auto with vec_db.
+      right; exists (idx_nxt p), (idx_nxt q); eauto.
+    + right; exists idx_fst, idx_fst; auto.
+  Qed.
+
+  Fact vec_embed_disj_inv_gen n (u u' : vec _ n) m (v v' : vec _ m) :
+        vec_embed (λ x x', ∀y y', P x y → Q x' y' → R y y' ∨ T x x' y y') u v
+      → vec_fall2 P u u'
+      → vec_fall2 Q v v'
+      → vec_embed R u' v' ∨ ∃ i j, T u⦃i⦄ v⦃j⦄ u'⦃i⦄ v'⦃j⦄.
   Proof.
     induction 1 as [ | n x u m y v H1 H2 IH2
                      | n   u m y v H1 IH2 ]; intros G1 G2; auto.
@@ -337,6 +354,22 @@ Section vec_embed_disj_inv.
       destruct (IH2 _ _ G1 G4) as [ F | (p & q & F) ]; auto with vec_db.
       right; exists p, (idx_nxt q); auto.
   Qed.
+
+End vec_embed_disj_inv_gen.
+
+Section vec_embed_disj_inv.
+
+  Variable (X₁ X₂ Y₁ Y₂ : Type)
+           (P : X₁ → Y₁ → Prop)
+           (Q : X₂ → Y₂ → Prop)
+           (R T : Y₁ → Y₂ → Prop).
+
+  Fact vec_embed_disj_inv n (u u' : vec _ n) m (v v' : vec _ m) :
+        vec_embed (λ x x', ∀y y', P x y → Q x' y' → R y y' ∨ T y y') u v
+      → vec_fall2 P u u'
+      → vec_fall2 Q v v'
+      → vec_embed R u' v' ∨ ∃ i j, T u'⦃i⦄ v'⦃j⦄.
+  Proof. apply vec_embed_disj_inv_gen. Qed.
 
 End vec_embed_disj_inv.
 
@@ -367,14 +400,11 @@ Section vec_fall2_embed_disj_special.
       → vec_fall2 Q v v'
       → vec_fall2 R u' v' ∨ ∃i, T u⦃i⦄.
   Proof.
-    induction 1 as [ | n x u y v H1 H2 IH2 ] using vec_fall2_rect; intros G1 G2; auto with vec_db.
-    vec invert u' as x' u'; vec invert v' as y' v'.
-    apply vec_fall2_cons_inv in G2 as (G3 & G4).
-    apply vec_fall2_cons_inv in G1 as (G1 & G2).
-    destruct (H1 _ _ G1 G3) as [ F0 | F0 ].
-    + destruct (IH2 _ _ G2 G4) as [ F | (p & F) ]; auto with vec_db.
-      right; exists (idx_nxt p); auto.
-    + right; exists idx_fst; auto.
+    intros HR HP HQ.
+    apply vec_fall2_disj_inv_gen
+      with (T := λ x _ _ _, T x) (u' := u') (v' := v')
+      in HR
+      as [ | (? & ? & ?) ]; eauto.
   Qed.
 
   Fact vec_embed_disj_special n (u u' : vec _ n) m (v v' : vec _ m) :
@@ -383,20 +413,11 @@ Section vec_fall2_embed_disj_special.
       → vec_fall2 Q v v'
       → vec_embed R u' v' ∨ ∃i, T u⦃i⦄.
   Proof.
-    induction 1 as [ | n x u m y v H1 H2 IH2
-                     | n   u m y v H1 IH2 ]; intros G1 G2; auto.
-    + vec invert u'; vec invert v'; auto with vec_db.
-    + vec invert u' as x' u'; vec invert v' as y' v'.
-      apply vec_fall2_cons_inv in G2 as (G3 & G4).
-      apply vec_fall2_cons_inv in G1 as (G1 & G2).
-      destruct (H1 _ _ G1 G3) as [ F0 | F0 ].
-      * destruct (IH2 _ _ G2 G4) as [ F | (p & F) ]; auto with vec_db.
-        right; exists (idx_nxt p); auto.
-      * right; exists idx_fst; auto.
-    + vec invert v' as y' v'.
-      apply vec_fall2_cons_inv in G2 as (G3 & G4).
-      destruct (IH2 _ _ G1 G4) as [ F | (p & F) ]; auto with vec_db.
-      right; exists p; auto.
+    intros HR HP HQ.
+    apply vec_embed_disj_inv_gen
+      with (T := λ x _ _ _, T x) (u' := u') (v' := v')
+      in HR
+      as [ | (? & ? & ?) ]; eauto.
   Qed.
 
 End vec_fall2_embed_disj_special.

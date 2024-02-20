@@ -59,7 +59,7 @@ Section list_embed_vec_embed.
 
 End list_embed_vec_embed.
 
-Section af_svec_embed.
+Section af_lvec_embed.
 
   Variable (X : Type) (R : rel₂ X) (HR : af R).
 
@@ -77,4 +77,4 @@ Section af_svec_embed.
       intros -> ->; apply vec_embed_iff_list_embed.
   Qed.
 
-End af_svec_embed.
+End af_lvec_embed.
