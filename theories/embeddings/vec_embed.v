@@ -283,11 +283,13 @@ Proof.
     eauto with vec_db.
 Qed.
 
+#[local] Infix "≤sv" := (vec_embed (@eq _)) (at level 70).
+
 Section vec_embed_sub_vec.
 
   Variables (X Y : Type) (R : X → Y → Prop).
 
-  Infix "≤sv" := (vec_embed (@eq _)) (at level 70).
+
   Infix "≤ₑ" := (vec_embed R).
 
   Fact vec_embed_sub_vec_fall2 n (u : vec _ n) m (v : vec _ m) :
@@ -306,7 +308,34 @@ Section vec_embed_sub_vec.
       now intros ? ? (? & ? & []).
   Qed.
 
+  Fact vec_sub_embed_trans nu (u : vec X nu) nv (v : vec _ nv) nw (w : vec _ nw) :
+        u ≤sv v → v ≤ₑ w → u ≤ₑ w.
+  Proof.
+    intros H1 H2.
+    generalize (vec_embed_compose H1 H2).
+    apply vec_embed_mono.
+    intros ? ? (? & [] & ?); auto.
+  Qed.
+
+  Fact vec_embed_sub_trans nu (u : vec X nu) nv (v : vec _ nv) nw (w : vec _ nw) :
+         u ≤ₑ v → v ≤sv w → u ≤ₑ w.
+  Proof.
+    intros H1 H2.
+    generalize (vec_embed_compose H1 H2).
+    apply vec_embed_mono.
+    intros ? ? (? & ? & []); auto.
+  Qed.
+
 End vec_embed_sub_vec.
+
+Fact vec_sub_refl X n (u : vec X n) : u ≤sv u.
+Proof. induction u; eauto with vec_db. Qed.
+
+Fact vec_sub_trans X nu (u : vec X nu) nv (v : vec _ nv) nw (w : vec _ nw) :
+         u ≤sv v → v ≤sv w → u ≤sv w.
+Proof. apply vec_sub_embed_trans. Qed.
+
+#[global] Hint Resolve vec_sub_refl vec_sub_trans : vec_db.
 
 (* 𝕆𝕊 λ ∀∃ → ↔ ∧ ∨ *)
 
