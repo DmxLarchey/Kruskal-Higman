@@ -289,7 +289,6 @@ Section vec_embed_sub_vec.
 
   Variables (X Y : Type) (R : X → Y → Prop).
 
-
   Infix "≤ₑ" := (vec_embed R).
 
   Fact vec_embed_sub_vec_fall2 n (u : vec _ n) m (v : vec _ m) :
