@@ -16,7 +16,7 @@ From KruskalTrees
 From KruskalFinite
   Require Import finite choice.
 
-Require Import base tactics list_fan fan combi_principle.
+Require Import base tactics fan combi_principle.
 
 Import ListNotations lift_notations.
 
@@ -41,7 +41,7 @@ Section af_quasi_morphism.
             (ev_qmorph : ∀ x₁ x₂, R x₁ x₂ → T (ev x₁) (ev x₂) ∨ E x₁)
 
             (* if every analysis of y is exceptional then y must T-embed y0 *)
-            (HET : ∀y, ana_rel y ⊆₁ E → T y₀ y).
+            (excep_embed : ∀y, ana_rel y ⊆₁ E → T y₀ y).
 
             (** We want to conclude: af R → af T↑y₀ *)
 
@@ -51,8 +51,8 @@ Section af_quasi_morphism.
   Local Fact ana_spec x y : ev x = y ↔ x ∈ ana y.
   Proof. apply (proj2_sig (ana_fin _)). Qed.
 
-  Local Fact Forall2_analysis_eq lx ly :
-        Forall2 In lx (map ana ly) ↔ map ev lx = ly.
+  Local Fact FAN_analysis_eq lx ly :
+        FAN (map ana ly) lx ↔ map ev lx = ly.
   Proof.
     rewrite Forall2_map_right, <- Forall2_eq, Forall2_map_left.
     apply Forall2_equiv; intros ? ?; rewrite ana_spec; tauto.
@@ -71,76 +71,57 @@ Section af_quasi_morphism.
   Qed.
 
   (* A(nalyses) W(ell): all possible choice sequences of analyses are good *)
-  Local Definition AW ly := Forall (good R) (list_fan (map ana ly)).
+  Local Definition AW ly := FAN (map ana ly) ⊆₁ good R.
 
-  (*  Alternative defn. could be Forall2 ana ly ⊆₁ good R *)
-  Goal ∀ly, AW ly ↔ Forall2 ana_rel ly ⊆₁ good R.
+  (* The critical proof step: if ly Analyses Well then ly++[y₀] is good for T *)
+  Local Lemma AW_good_lifted ly : AW ly → good T (ly++[y₀]).
   Proof.
-    intros ly; unfold AW.
-    rewrite Forall_forall.
-    apply forall_equiv; intros lx.
-    rewrite list_fan_spec; equiv auto.
-    rewrite Forall2_map_right, Forall2_xchg.
-    apply Forall2_equiv; intros ? ?.
-    rewrite ana_spec; tauto.
-  Qed.
-
-  (* The critical proof: if ly AW for R then ly++[y₀] is good for T *)
-  Local Lemma AW_good_snoc ly : AW ly → good T (ly++[y₀]).
-  Proof.
-    intros Hm; red in Hm.
+    intros Hly; red in Hly.
     destruct list_combi_principle
       with (P := λ l, good T (map ev l))
-           (B := E)
-           (ll := map ana ly)
+           (B := E) (ll := map ana ly)
       as [ (lx & H1 & H2) | (a & H1 & H2) ].
-
     + (* Hypothesis for combi principle *)
-      intros lx Hlx.
-      rewrite Forall_forall in Hm.
-      apply list_fan_spec, Hm in Hlx.
-      now apply ev_good_or_exceptional.
-
+      now intros lx Hlx%Hly%ev_good_or_exceptional.
     + (* there is (choice) sequence of analyses lx of ly which maps
          to a good sequence, but lx maps to ly hence ly is good *)
-      apply Forall2_analysis_eq in H1 as <-.
+      apply FAN_analysis_eq in H1 as <-.
       now apply good_app_right.
-
     + (* there is an evaluation in ly of which all analyses are exceptional *)
       apply in_map_iff in H1 as (y & <- & H1).
-      apply good_snoc with y; auto.
-      apply HET.
+      apply good_snoc with y, excep_embed; auto.
       now intros ? ?%ana_spec%H2.
   Qed.
 
-  Local Corollary bar_AW_good_snoc ly : bar AW ly → bar (good T) (ly++[y₀]).
+  (* The previous results lifted to bar *)
+  Local Corollary bar_AW_good_lifted ly : bar AW ly → bar (good T) (ly++[y₀]).
   Proof.
-    intros H; apply bar_app; revert H.
-    apply bar_mono, AW_good_snoc.
+    intros Hly; apply bar_app.
+    revert Hly; apply bar_mono, AW_good_lifted.
   Qed.
 
   Hypothesis (HR : af R).
 
   (* The bar formulation for the FAN theorem below *)
   Local Fact bar_goodR_nil : bar (good R) [].
-  Proof. apply af_iff_bar_good_nil; auto. Qed.
+  Proof. now apply af_iff_bar_good_nil. Qed.
 
-  (* By the FAN theorem, since R is af,
-     all sequences will uniformly AW *)
-  Local Fact bar_AW_nil : bar AW [].
+  Hint Resolve good_skip bar_goodR_nil : core.
+
+  (* By the FAN theorem, since R is af, all sequences
+     will uniformly analyse well *)
+  Local Lemma bar_AW_nil : bar AW [].
   Proof.
     apply bar_map_inv
       with (f := ana)
-           (Q := λ ll, Forall (good R) (list_fan ll)); auto.
-    exact (fan_on_list (@good_skip _ R) bar_goodR_nil).
+           (Q := λ ll, FAN ll ⊆₁ good R); auto.
+    apply FAN_theorem; auto.
   Qed.
 
   Theorem af_quasi_morph_fun : af T↑y₀.
   Proof.
-    apply af_iff_bar_good_nil,
-          bar_rel_lift,
-          bar_AW_good_snoc,
-          bar_AW_nil.
+    apply af_iff_bar_good_nil, bar_rel_lift,
+          bar_AW_good_lifted, bar_AW_nil.
   Qed.
 
 End af_quasi_morphism.
@@ -193,6 +174,5 @@ Tactic Notation "af" "quasi" "morph" "rel" uconstr(f) uconstr(e) :=
   match goal with
   | |- af _ → af _ => apply af_quasi_morph_rel with (ea_rel := f) (E := e)
   end.
-
 
 
