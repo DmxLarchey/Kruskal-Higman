@@ -5,8 +5,6 @@ tactics.v
 base/base.v
 base/base_implem.v
 
-#list/list_utils.v
-
 embeddings/list_embed.v
 embeddings/vec_embed.v
 embeddings/utree_embed.v
