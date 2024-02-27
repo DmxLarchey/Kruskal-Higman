@@ -16,11 +16,30 @@ From KruskalTrees
 From KruskalFinite
   Require Import finite choice.
 
-Require Import base list_fan.
+Require Import base.
 
 Import ListNotations idx_notations.
 
 Set Implicit Arguments.
+
+Section list_prod.
+
+  Variable (X Y Z : Type) (f : X → Y → Z).
+
+  Implicit Types (l : list X) (m : list Y).
+
+  Definition list_prod l m := flat_map (λ x, map (f x) m) l.
+
+  Hint Resolve in_map : core.
+
+  Fact list_prod_spec l m z : z ∈ list_prod l m ↔ ∃ x y, z = f x y ∧ x ∈ l ∧ y ∈ m.
+  Proof.
+    unfold list_prod; rewrite in_flat_map; split.
+    + intros (? & ? & (? & <- & ?)%in_map_iff); eauto.
+    + intros (? & ? & -> & []); eauto.
+  Qed.
+
+End list_prod.
 
 Section matrix_choice_list.
 

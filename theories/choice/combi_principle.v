@@ -11,65 +11,38 @@ From Coq
   Require Import List Utf8.
 
 From KruskalTrees
-  Require Import notations idx vec.
+  Require Import notations list_utils.
 
 From KruskalFinite
-  Require Import finite.
+  Require Import finite choice.
 
-Require Import base vec_embed indexed_choice.
+Require Import base.
 
-Import ListNotations idx_notations vec_notations.
+Import ListNotations.
 
 Set Implicit Arguments.
 
-Theorem fin_vec_fall2_find X Y (R : X → Y → Prop) P n (v : vec X n) :
-      (∀i, fin (R v⦃i⦄))
-    → (∀w, vec_fall2 R v w → ∃i, P w⦃i⦄)
-    → (∃i, R v⦃i⦄ ⊆₁ P).
-Proof. 
-  intros H1 H2. 
-  apply fin_indexed_choice with (X := fun i => R v⦃i⦄); auto.
-  intros w Hw.
-  destruct (H2 (vec_set w)) as (i & Hi).
-  + intro; vec rew; auto.
-  + exists i; revert Hi; now vec rew.
-Qed.
+#[local] Hint Resolve in_eq in_cons : core.
+#[local] Notation FAN lw := (λ c, Forall2 (λ x l, x ∈ l) c lw).
 
-Theorem vec_combi_principle X n (P : rel₁ (vec X n)) (B : rel₁ X) (R : vec (list X) n) :
-         (∀v, vec_fall2 In v R → P v ∨ ∃p, B v⦃p⦄)
-       → (∃v, vec_fall2 In v R ∧ P v)
-       ∨ (∃i, ∀x, x ∈ R⦃i⦄ → B x).
-Proof.
-  intros H.
-  destruct fin_matrix_choice
-    with (P := fun c => P (vec_set c))
-         (Q := fun _ : idx n => B)
-         (X := fun i x => x ∈ R⦃i⦄)
-    as [ (c & H1 & H2) | (p & Hp) ]; eauto.
-  + intro i; exists R⦃i⦄; tauto.
-  + intros c Hc.
-    destruct (H (vec_set c)) as [ | (p & Hp) ]; auto.
-    * now intro; vec rew.
-    * right; exists p; rewrite vec_prj_set in Hp; auto.
-  + left; exists (vec_set c); split; auto.
-    now intro; vec rew.
-Qed.
+Fact fin_FAN X (lw : list (list X)) : fin (FAN lw).
+Proof. apply fin_Forall2_rev; fin auto. Qed.
 
 Theorem list_combi_principle X (P : rel₁ (list X)) (B : rel₁ X) ll :
-         (∀c, Forall2 In c ll → P c ∨ (λ x, x ∈ c) ⧫ B)
-       → (∃c, Forall2 In c ll ∧ P c)
-       ∨ (∃A, A ∈ ll ∧ ∀x, x ∈ A → B x).
+         (∀c, FAN ll c → P c ∨ (λ x, x ∈ c) ⧫ B)
+       → (∃c, FAN ll c ∧ P c)
+       ∨ (∃l, l ∈ ll ∧ ∀x, x ∈ l → B x).
 Proof.
-  intros H.
-  generalize ⌊ll⌋ (list_vec ll) (vec_list_vec ll); intros n R <-.
-  destruct (@vec_combi_principle X n (fun v => P (vec_list v)) B R)
-    as [ (v & H1 & H2) | (p & Hp) ].
-  + intros v Hv.
-    destruct (H (vec_list v)) as [ | (x & H1 & H2) ]; auto.
-    * apply Forall2_iff_vec_fall2; auto.
-    * apply in_vec_list in H1 as (p & <-); eauto.
-  + left; exists (vec_list v); split; auto.
-    apply Forall2_iff_vec_fall2; auto.
-  + right; exists (R⦃p⦄); split; auto.
-    apply in_vec_list; eauto.
+  induction ll as [ | w lw IHlw ] in P |- *; intros HPB.
+  + destruct (HPB []) as [ | (_ & [] & _) ]; eauto.
+  + assert (H: ∀x, x ∈ w → B x ∨ (∀c, FAN lw c → P (x :: c) ∨ (∃y, y ∈ c ∧ B y))).
+    1:{ intros x Hx.
+        apply fin_choice_cst_left.
+        + apply fin_FAN.
+        + intros c Hc.
+          destruct (HPB (x::c)) as [ | (? & [<- | ] & ?) ]; eauto. }
+    apply list_choice in H as [ | (x & ? & [ (c & []) | (m & []) ]%IHlw) ].
+    * right; exists w; eauto.
+    * left; exists (x::c); eauto.
+    * right; exists m; eauto.
 Qed.

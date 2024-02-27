@@ -22,6 +22,8 @@ Import ListNotations lift_notations.
 
 Set Implicit Arguments.
 
+#[local] Notation FAN lw := (λ c, Forall2 (λ x l, x ∈ l) c lw).
+
 Section af_quasi_morphism.
 
   Variables (X Y : Type) (ev : X → Y).

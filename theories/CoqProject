@@ -5,14 +5,12 @@ tactics.v
 base/base.v
 base/base_implem.v
 
-list/list_utils.v
-list/list_fan.v
+#list/list_utils.v
 
 embeddings/list_embed.v
 embeddings/vec_embed.v
 embeddings/utree_embed.v
 
-choice/indexed_choice.v
 choice/combi_principle.v
 choice/choice_base.v
 
