@@ -49,8 +49,6 @@ Section FAN_theorem.
      Notice that when u is [], we simply get FAN lw ⊆₁ P *)
   Let Plift_on_FAN u lw := FAN lw ⊆₁ λ v, P (v++u).
 
-  About Forall2_app_inv_r.
-
   Local Fact Plift_on_FAN_monotone u : monotone (Plift_on_FAN u).
   Proof.
     intros ? ? Hv ? (? & ? & ? & ?%Hv & ->)%Forall2_cons_inv_r.
