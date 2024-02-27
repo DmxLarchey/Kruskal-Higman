@@ -11,7 +11,7 @@ From Coq
   Require Import List Utf8.
 
 From KruskalFinite
-   Require Import finite choice.
+   Require Import finite.
 
 Require Import base.
 

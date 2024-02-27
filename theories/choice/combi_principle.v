@@ -23,6 +23,12 @@ Import ListNotations.
 Set Implicit Arguments.
 
 #[local] Hint Resolve in_eq in_cons : core.
+
+(** Below the FAN of a list of lists is characterized as a
+    predicate derived for the list product Forall2 in list
+    membership. Its finiteness is not explicited but rather
+    derived from KruskalFinite tools. *)
+
 #[local] Notation FAN lw := (λ c, Forall2 (λ x l, x ∈ l) c lw).
 
 Fact fin_FAN X (lw : list (list X)) : fin (FAN lw).
