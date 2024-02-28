@@ -44,12 +44,11 @@ Theorem af_utree_embed X Y (R : rel₂ X) (R : rel₂ Y) : af R → af T → af 
 The proof proceeds as following (sketch):
 1. first a lexicographic induction on the _AF-complexity_ of `(af T,af R)`. How this is implemented
    here is a bit complicated because it is a downgrade for the case of a list `[af Rₙ;...;af R₁]`
-   of almost ful predicates (see [`af/af_lex.v`](theories/af/af_lex.v);
+   of almost ful predicates (see [`af/af_lex.v`](theories/af/af_lex.v));
 2. this lexicographic can just be implemented by nested induction with `utree X Y` where `n=2`;
-3. apply the second constructor of `af` and one needs to prove `af (utree_embed R T)↑t` for
-   any `t : utree X Y`;
-4. proceed by structural induction on `t`. We consider only the more complicated case
-   where `t = ⟨α|τ⟩₁` where `α : Y` and `τ : utree X Y`;
+3. apply the second constructor of `af`. One needs to prove `af (utree_embed R T)↑t` for
+   any `t : utree X Y`. Proceed by structural induction on `t`. 
+4. Here we consider only the more complicated case where `t = ⟨α|τ⟩₁` where `α : Y` and `τ : utree X Y`;
 5. the following propositions hold (see [`af/af_utree_embed_fun.v`](theories/af/af_utree_embed_fun.v):
   - `af (utree_embed R T)↑τ` (by induction on `t`)
   - hence `af R'` where `R' := R + T ⨉ (utree_embed R T)↑τ` (by Ramsey)
