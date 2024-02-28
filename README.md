@@ -22,9 +22,22 @@ The terminology and proof structure are largely inspired from Wim Veldman's [int
 ```coq
 Inductive list_embed {X Y} (R : X → Y → Prop) : list X → list Y → Prop :=
   | list_embed_nil :           [] ≤ₗ []
-  | list_embed_head x l y m :  R x y → l ≤ₗ m → x::l ≤ₗ y::m
+  | list_embed_head x l y m :  R x y  → l ≤ₗ m → x::l ≤ₗ y::m
   | list_embed_skip l y m :    l ≤ₗ m → l ≤ₗ y::m
 where "l ≤ₗ m" := (list_embed R l m).
 
-Theorem af_list X (R : rel₂ X) : af R → af (list_embed R).
+Theorem af_list_embed X (R : rel₂ X) : af R → af (list_embed R).
 ```
+
+We derive Higman's lemma [as stated on Wikipedia](https://en.wikipedia.org/w/index.php?title=Higman%27s_lemma&oldid=841018000)
+where the sub-list relation is abstracted by assuming its inductive rules:
+```coq
+Variables (X : Type) (≤sl : rel₂ (list X))
+          (_ : ∃ l, ∀x : X, x ∈ l) 
+          (_ : [] ≤sl [])
+          (_ : ∀ x l m, l ≤sl m → x::l ≤sl x::m)
+          (_ : ∀ x l m, l ≤sl m → l ≤sl x::m).
+
+Theorem Higman_lemma : ∀ f : nat → list X, ∃ i j, i < j ∧ fᵢ ≤sl fⱼ.
+```
+
