@@ -95,14 +95,14 @@ Section af_utree_nodes_rel.
 
   (* The evaluation map that unpacks compound nodes, described as a relation
      (ie a graph), not as a (Coq) function *)
-  Inductive hev_graph : ∀c, utree X' (Y' c) → utree X Y → Prop :=
-    | in_hev_graph_0 c x :       ⟨⦗x⦘₁⟩₀   -[c]-> ⟨x⟩₀
-    | in_hev_graph_1 c y t :     ⟨⦗y,t⦘₂⟩₀ -[c]-> ⟨y|t⟩₁
-    | in_hev_graph_2 y s t :             s -[◩]-> t
+  Inductive ev_graph : ∀c, utree X' (Y' c) → utree X Y → Prop :=
+    | in_ev_graph_0 c x :        ⟨⦗x⦘₁⟩₀   -[c]-> ⟨x⟩₀
+    | in_ev_graph_1 c y t :      ⟨⦗y,t⦘₂⟩₀ -[c]-> ⟨y|t⟩₁
+    | in_ev_graph_2 y s t :              s -[◩]-> t
                                   → ⟨y|s⟩₁ -[◩]-> ⟨y|t⟩₁
-  where "t' -[ c ]-> t" := (hev_graph c t' t).
+  where "t' -[ c ]-> t" := (ev_graph c t' t).
 
-  Hint Constructors hev_graph : core.
+  Hint Constructors ev_graph : core.
 
   Section inversion_lemmas.
 
@@ -111,7 +111,7 @@ Section af_utree_nodes_rel.
         can be somewhat tricky to write down so that they properly type,
         eg see dependent pattern matching below *)
 
-    Local Fact hev_graph_left_inv c t' t :
+    Local Fact ev_graph_left_inv c t' t :
          t' -[c]-> t
        ↔ match t' with
          | ⟨⦗x⦘₁⟩₀   => t = ⟨x⟩₀
@@ -131,7 +131,7 @@ Section af_utree_nodes_rel.
         intros (? & -> & ?); auto.
     Qed.
 
-    Local Fact hev_graph_right_inv c t' t :
+    Local Fact ev_graph_right_inv c t' t :
           t' -[c]-> t
         ↔ match c, t return utree X' (Y' c) → Prop with
           | ▣, ⟨x⟩₀   => λ t', t' = ⟨⦗x⦘₁⟩₀
@@ -149,29 +149,29 @@ Section af_utree_nodes_rel.
 
   End inversion_lemmas.
 
-  Tactic Notation "hev" "left" "inv" hyp(H) :=
+  Tactic Notation "ev" "left" "inv" hyp(H) :=
     match type of H with
-      | ⟨⦗_⦘₁⟩₀ -[_]-> _   => apply hev_graph_left_inv in H as ->
-      | ⟨⦗_,_⦘₂⟩₀ -[_]-> _ => apply hev_graph_left_inv in H as ->
+      | ⟨⦗_⦘₁⟩₀ -[_]-> _   => apply ev_graph_left_inv in H as ->
+      | ⟨⦗_,_⦘₂⟩₀ -[_]-> _ => apply ev_graph_left_inv in H as ->
       | ⟨_|_⟩₁ -[◩]-> ?x   => let t := fresh in
-                              apply hev_graph_left_inv in H as (t & -> & H);
+                              apply ev_graph_left_inv in H as (t & -> & H);
                                 rename t into x
-      | ⟨_|_⟩₁ -[▣]-> ?x   => apply hev_graph_left_inv in H as []
+      | ⟨_|_⟩₁ -[▣]-> ?x   => apply ev_graph_left_inv in H as []
       | ⟨_|_⟩₁ -[?c]-> ?x  => let t := fresh in
-                              apply hev_graph_left_inv in H; revert H;
+                              apply ev_graph_left_inv in H; revert H;
                                 destruct c; [ intros (t & -> & H) | intros [] ];
                                 rename t into x
     end.
 
   (* The graph describes a functional and strongly total relation *)
-  Local Lemma hev_graph_fun c t' t₁ t₂ : t' -[c]-> t₁ → t' -[c]-> t₂ → t₁ = t₂.
+  Local Lemma ev_graph_fun c t' t₁ t₂ : t' -[c]-> t₁ → t' -[c]-> t₂ → t₁ = t₂.
   Proof.
     intros H; revert H t₂.
-    induction 1; intros ? G; hev left inv G; auto.
+    induction 1; intros ? G; ev left inv G; auto.
     f_equal; auto.
   Qed.
 
-  Local Lemma hev_graph_total c t' : { t | t' -[c]-> t }.
+  Local Lemma ev_graph_total c t' : { t | t' -[c]-> t }.
   Proof.
     induction t' as [ [ x | (y,t) ] | y t' (t & Ht) ].
     + exists ⟨x⟩₀; auto.
@@ -189,7 +189,7 @@ Section af_utree_nodes_rel.
         ana c ⟨x⟩₀ t' ↔ ⟨⦗x⦘₁⟩₀ = t'.
     Proof.
       split.
-      + intros ?%hev_graph_right_inv; now destruct c.
+      + intros ?%ev_graph_right_inv; now destruct c.
       + intros <-; auto.
     Qed.
 
@@ -197,7 +197,7 @@ Section af_utree_nodes_rel.
         ana ▣ ⟨y|t⟩₁ t' ↔ ⟨⦗y,t⦘₂⟩₀ = t'.
     Proof.
       split.
-      + now intros ?%hev_graph_right_inv.
+      + now intros ?%ev_graph_right_inv.
       + intros <-; auto.
     Qed.
 
@@ -206,14 +206,14 @@ Section af_utree_nodes_rel.
                          ∨ ∃t'', ⟨y|t''⟩₁ = t' ∧ ana ◩ t t''.
     Proof.
       split.
-      + intros ?%hev_graph_right_inv; firstorder.
+      + intros ?%ev_graph_right_inv; firstorder.
       + intros [ <- | (? & <- & ?) ]; auto.
     Qed.
 
   End analysis_cases.
 
   (* The reverse of the evaluation graph (ie the analysis) is finitary *)
-  Local Lemma hev_graph_inv_fin c t : fin (ana c t).
+  Local Lemma ev_graph_inv_fin c t : fin (ana c t).
   Proof.
     induction t as [ x | y t IHt ].
     + finite eq (analysis_leaf _ _).
@@ -259,13 +259,13 @@ Section af_utree_nodes_rel.
   Local Fact sub_utree_has_disap c s t : s ≤ut t → E' c s → E' c t.
   Proof. intros ? (w & ? & ?); exists w; eauto with utree_db. Qed.
 
-  Hint Resolve hev_graph_inv_fin
+  Hint Resolve ev_graph_inv_fin
                disap_has_disap
                sub_utree_has_disap : core.
 
   (* By induction on the utree_embed predicate and
      then left inversion on -[c]->, and also on R' *)
-  Local Lemma hev_quasi_morphism c t1' t2' t1 t2 :
+  Local Lemma ev_quasi_morphism c t1' t2' t1 t2 :
          t1' ≼[c] t2'
        → t1' -[c]-> t1
        → t2' -[c]-> t2
@@ -276,10 +276,10 @@ Section af_utree_nodes_rel.
                    |    t1' y2 t2' H1 IH1
                    | y1 t1' y2 t2' H1 H2 IH2 ]; intros t1 t2 G1 G2.
     + destruct H1 as [ | ? ? ? ? ? [] ];
-        hev left inv G1; hev left inv G2; auto with utree_db.
-    + hev left inv G2.
+        ev left inv G1; ev left inv G2; auto with utree_db.
+    + ev left inv G2.
       destruct (IH1 _ _ G1 G2); auto with utree_db.
-    + hev left inv G1; hev left inv G2.
+    + ev left inv G1; ev left inv G2.
       specialize (IH2 _ _ G1 G2).
       revert H1 IH2; intros [] []; eauto with utree_db.
   Qed.
@@ -417,15 +417,15 @@ Section af_utree_nodes_rel.
 
   End RT'_af.
 
-  Hint Resolve hev_graph_total
-               hev_graph_fun
-               hev_quasi_morphism
+  Hint Resolve ev_graph_total
+               ev_graph_fun
+               ev_quasi_morphism
                exceptional_embed : core.
 
   Theorem af_utree_nodes : af (utree_embed R T)↑⟨α|τ⟩₁.
   Proof.
     generalize RT'_af.
-    af quasi morph rel (hev_graph c₀) (E' c₀); eauto.
+    af quasi morph rel (ev_graph c₀) (E' c₀); eauto.
   Qed.
 
 End af_utree_nodes_rel.

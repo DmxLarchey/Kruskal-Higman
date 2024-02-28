@@ -22,6 +22,12 @@ Section Higman_lemma.
 
         https://en.wikipedia.org/w/index.php?title=Higman%27s_lemma&oldid=841018000
 
+      where sub-sequence is abstracted as any relation ≤sl over list 
+      satisfying:
+        1) [] ≤sl []
+        2) l ≤sl m → x::l ≤sl x::m
+        3) l ≤sl m → l ≤sl x::m
+
    *)
 
   Variables (X : Type) (HX : ∃ₜ l, ∀x : X, x ∈ l) (R : rel₂ (list X)).

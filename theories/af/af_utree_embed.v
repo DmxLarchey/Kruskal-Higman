@@ -61,9 +61,9 @@ Theorem af_utree_embed X Y (R : rel₂ X) (T : rel₂ Y) :
         af R → af T → af (utree_embed R T).
 Proof.
   (* First the "easier" induction on the af pair (af R , af T) *)
-  revert X R Y T;
-    apply af_easier_ind;
-    intros sR X R sT Y T HR HT IH.
+  revert X R Y T.
+  apply af_easier_induction.
+  intros sR X R sT Y T HR HT IH.
 
   (* Then lifting by t and induction on t *)
   constructor 2; intros t.

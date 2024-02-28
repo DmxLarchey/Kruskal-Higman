@@ -77,6 +77,9 @@ Section af_utree_nodes.
 
   Let Y' c := match c with ◩ => Y | ▣ => Empty_set end.
 
+  Goal utree X' (Y' ▣) = utree (X+Y*utree X Y) Empty_set.  Proof. reflexivity. Qed.
+  Goal utree X' (Y' ◩) = utree (X+Y*utree X Y) Y.          Proof. reflexivity. Qed.
+
   (* The new relations on X' and Y' respectivelly *)
 
   Inductive hl_rel_leaves : rel₂ X' :=
@@ -89,6 +92,9 @@ Section af_utree_nodes.
             → hl_rel_leaves ⦗u,s⦘₂ ⦗v,t⦘₂.
 
   Notation R' := hl_rel_leaves.
+
+  (* The relation R' on X+Y*utree X Y is equivalent to R + T*(utree_embed R T)↑τ
+     and well be proved AF by Ramsey and the induction hypotheses. *)
 
   Hint Constructors R' : core.
 
@@ -110,21 +116,15 @@ Section af_utree_nodes.
      an empty type. *)
   Let T' c := match c return rel₂ (Y' c) with ◩ => T↑α | ▣ => ⊥₂ end.
 
-  Infix "≼" := (utree_embed R T) (at level 70).
-  Notation "r '≼[' c ']' t" := (utree_embed R' (T' c) r t) (at level 70, format "r  ≼[ c ]  t").
-
-  (* The type utree X' (Y' ▣) := utree (X+Y*utree X Y) Empty_set
-              utree X' (Y' ◩) := utree (X+Y*utree X Y) Y
-
-     The relation R' on X+Y*utree X Y is R + T*(utree_embed R T)↑τ
-     is AF by Ramsey and the induction hypotheses
-
-     The relation T' ▣ := _ (anything) is AF because on the empty type
-     The relation T' ◩ := T↑α is AF (it is smaller by IH because lifted from T) 
+  (* The relation T' ▣ := _ (anything) is AF because on the empty type
+     The relation T' ◩ := T↑α is AF (it is smaller by IH because lifted from T)
 
      The most interesting case here is when ◩. In that case, the type for
      the leaf X' (arity 0) is augmented by a node of arity 1 and
      one subtree from that node. *)
+
+  Infix "≼" := (utree_embed R T) (at level 70).
+  Notation "r '≼[' c ']' t" := (utree_embed R' (T' c) r t) (at level 70, format "r  ≼[ c ]  t").
 
   (** We build a quasi morphism hev c : utree X' (Y' c) → utree X Y 
      from the embedding ≼[c] to the lifted embedding ≼↑⟨α|τ⟩₁
@@ -135,26 +135,26 @@ Section af_utree_nodes.
 
       A bit of dependent pattern matching to define hev ◩/▣ simultaneously *)
 
-  Fixpoint hev c (t' : utree X' (Y' c)) : utree X Y :=
+  Fixpoint ev c (t' : utree X' (Y' c)) : utree X Y :=
     match t' with
     | ⟨⦗x⦘₁⟩₀   => ⟨x⟩₀
     | ⟨⦗y,t⦘₂⟩₀ => ⟨y|t⟩₁
     | ⟨y'|t'⟩₁  =>
       match c return Y' c → utree X' (Y' c) → utree X Y with
-      | ◩ => λ y' t', ⟨y'|hev ◩ t'⟩₁
+      | ◩ => λ y' t', ⟨y'|ev ◩ t'⟩₁
       | ▣ => λ y' _ , match y' with end
       end y' t'
    end.
 
   (** These are the recursives equations that we want for the evaluation *)
 
-  Goal ∀ c x,   hev c ⟨⦗x⦘₁⟩₀   = ⟨x⟩₀.            Proof. reflexivity. Qed.
-  Goal ∀ c y t, hev c ⟨⦗y,t⦘₂⟩₀ = ⟨y|t⟩₁.          Proof. reflexivity. Qed.
-  Goal ∀ y' t', hev ◩ ⟨y'|t'⟩₁  = ⟨y'|hev ◩ t'⟩₁.  Proof. reflexivity. Qed.
+  Goal ∀ c x,   ev c ⟨⦗x⦘₁⟩₀   = ⟨x⟩₀.           Proof. reflexivity. Qed.
+  Goal ∀ c y t, ev c ⟨⦗y,t⦘₂⟩₀ = ⟨y|t⟩₁.         Proof. reflexivity. Qed.
+  Goal ∀ y' t', ev ◩ ⟨y'|t'⟩₁  = ⟨y'|ev ◩ t'⟩₁.  Proof. reflexivity. Qed.
 
-  (** There is no equation for hev ▣ ⟨y'|t'⟩₁ because Y' ▣ is empty *)
+  (** There is no equation for ev ▣ ⟨y'|t'⟩₁ because Y' ▣ is empty *)
 
-  (** Here we view the "evaluation" (hev) as a total function but in more
+  (** Here we view the "evaluation" (ev) as a total function but in more
       complicated cases, it is very relevant to view it as a "bidirectional
       process" instead, ie a binary relation. Indeed, the evaluation is
       not necessarily total or computable. Moreover, its converse relation
@@ -162,15 +162,15 @@ Section af_utree_nodes.
 
               Analyses in utree X' Y'   /      Evalutations in utree X y
 
-                t' : utree X' Y'    --[hev]->    t = hev t' : utree X Y
-                  ana t t'          <-[ana]--    t : utree X Y
+                t' : utree X' Y'    --[ev]->    t = ev t' : utree X Y
+                  ana t t'          <-[ana]-    t : utree X Y
 
       The ana(lysis) process is not a function because it is
       non-deterministic. However (and critically) it is finitary hence
       an evaluation only has finitely many corresponding analyses. Hence
       one could possibly view analysis as a map 
 
-                 ana : utree X Y -> list (utree X' Y')
+                 ana : utree X Y → list (utree X' Y')
 
       but it is really not convenient to view it as a function because
       it overloads proofs with lots of edge-cases and cannot work when 
@@ -201,7 +201,7 @@ Section af_utree_nodes.
       in 2014. This renders the proof mostly undeciphereable. *)
 
   (* ana(lysis) is the converse relation of evaluation *)
-  Notation ana := (λ c t t', hev c t' = t).
+  Notation ana := (λ c t t', ev c t' = t).
 
   (** We put the ana(lysis) predicate in a shape compatible with
       the KruskalFinite library tools *)
@@ -297,9 +297,9 @@ Section af_utree_nodes.
 
   Hint Resolve disap_has_disap sub_utree_has_disap : core.
 
-  (* hev c is a quasi morphism *)
-  Local Lemma hev_quasi_morphism c s' t' :
-         s' ≼[c] t' → hev c s' ≼ hev c t' ∨ E' c s'.
+  (* ev c is a quasi morphism *)
+  Local Lemma ev_quasi_morphism c s' t' :
+         s' ≼[c] t' → ev c s' ≼ ev c t' ∨ E' c s'.
   Proof.
     induction 1 as [ x1 x2 H1
                    |    t1' y2 t2' H1 IH1
@@ -457,8 +457,10 @@ Section af_utree_nodes.
 
     Local Fact R'_af : af R'.
     Proof.
-      generalize (af_sum R_af (af_product T_af IHτ)).
-      apply af_mono.
+      apply af_mono
+        with (2 := af_sum
+                     R_af 
+                     (af_product T_af IHτ)).
       intros [|[]] [|[]]; simpl; auto; try easy.
       intros []; auto.
     Qed.
@@ -489,12 +491,12 @@ Section af_utree_nodes.
 
   End RT'_af.
 
-  Hint Resolve hev_quasi_morphism exceptional_embed : core.
+  Hint Resolve ev_quasi_morphism exceptional_embed : core.
 
   Theorem af_utree_nodes : af (utree_embed R T)↑⟨α|τ⟩₁.
   Proof.
     generalize RT'_af.
-    af quasi morph fun (hev c₀) (E' c₀); eauto.
+    af quasi morph fun (ev c₀) (E' c₀); eauto.
   Qed.
 
 End af_utree_nodes.

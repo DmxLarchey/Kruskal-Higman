@@ -53,9 +53,11 @@ Tactic Notation "equiv" "sum" :=
 Tactic Notation "equiv" "auto" :=
   repeat (
     match goal with
-      | |- _ ∨ _ ↔ _ ∨ _ => apply or_equiv
-      | |- _ ∧ _ ↔ _ ∧ _ => apply and_equiv
-      | |- (_ → _) ↔ (_ → _) => apply imp_equiv
-      | |- ex _ ↔ ex _ => let x := fresh in apply exists_equiv; intro x
-      | |- (∀_, _) ↔ (∀_, _) => let x := fresh in apply forall_equiv; intro x
+    | |-  _ ∨ _  ↔  _ ∨ _  => apply or_equiv
+    | |-  _ ∧ _  ↔  _ ∧ _  => apply and_equiv
+    | |- (_ → _) ↔ (_ → _) => apply imp_equiv
+    | |-  _ + _  ⇄  _ + _  => apply sum_equiv
+    | |-  _ * _  ⇄  _ * _  => apply prod_equiv
+    | |- ex _ ↔ ex _ => let x := fresh in apply exists_equiv; intro x
+    | |- (∀_, _) ↔ (∀_, _) => let x := fresh in apply forall_equiv; intro x
     end; auto; try tauto).

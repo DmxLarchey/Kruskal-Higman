@@ -154,7 +154,6 @@ Section afw.
               (IHP : ∀w, (∀w', w' <w w → P (afw_forget w')) → P (afw_forget w)).
 
     (* We prove the property for empty X *)
-
     Local Fact HP_empty XR : wrel₂_accepted (▢,XR) → P XR.
     Proof.
       intros C.
@@ -162,10 +161,9 @@ Section afw.
       intros ? []%lt_afw_empty.
     Qed.
 
-    (* We prove the property for full R over X *)
-
     Hint Resolve HP_empty : core.
 
+    (* We prove the property for full R over X *)
     Local Fact HP_full XR : wrel₂_accepted (▣,XR) → P XR.
     Proof.
       simpl; intros C.
@@ -186,9 +184,9 @@ Section afw.
 
     Hint Resolve HP_full : core.
 
-    Local Fact HP_lift : ∀XR, wrel₂_accepted (◩,XR) → P XR.
+    Local Fact HP_lift XR : wrel₂_accepted (◩,XR) → P XR.
     Proof.
-      intros (X,R); simpl.
+      destruct XR as (X,R); simpl.
       induction 1 as [ R HR | R HR IHR ].
       + apply HP_full; simpl; auto.
       + apply IHP with (w := existT _ (◩,existT _ X R) (af_lift HR)); simpl; auto.
@@ -213,8 +211,8 @@ End afw.
 #[local] Notation "⟪ a , b , c ⟫" := (a,existT _ b c).
 #[local] Notation "⟪ a , b , c ⟫ₐ" := (wrel₂_accepted ⟪a,b,c⟫).
 #[local] Notation "x ≺ y" := (lt_wrel₂ x y) (at level 70).
-#[local] Notation afw_witness := (fun w => fst (projT1 w)).
-#[local] Notation afw_forget := (fun w => snd (projT1 w)).
+#[local] Notation afw_witness := (λ w, fst (projT1 w)).
+#[local] Notation afw_forget  := (λ w, snd (projT1 w)).
 
 #[local] Reserved Notation "x '≺₂' y" (at level 70, no associativity, format "x  ≺₂  y").
 
@@ -223,12 +221,8 @@ Section af_easier_ind.
   Unset Elimination Schemes.
 
   Inductive af_easier : wrel₂ * wrel₂ → wrel₂ * wrel₂ → Base :=
-    | af_easier_left wr₁ wr₁' wr₂ wr₂' :
-                               wr₂ ≺ wr₂'
-                            → (wr₁,wr₂) ≺₂ (wr₁',wr₂')
-    | af_easier_righ wr₁ wr₁' wr₂ :
-                               wr₁ ≺ wr₁'
-                            → (wr₁,wr₂) ≺₂ (wr₁',wr₂)
+    | af_easier_left wr₁ wr₁' wr₂ wr₂' :   wr₂ ≺ wr₂' → (wr₁,wr₂) ≺₂ (wr₁',wr₂')
+    | af_easier_right wr₁ wr₁' wr₂ :       wr₁ ≺ wr₁' → (wr₁,wr₂) ≺₂ (wr₁',wr₂)
   where "p ≺₂ q" := (af_easier p q).
 
   Set Elimination Schemes.
@@ -244,7 +238,7 @@ Section af_easier_ind.
             (IHQ : ∀ s₃ X₃ R₃ s₄ X₄ R₄,
                        ⟪s₃,X₃,R₃⟫ₐ
                      → ⟪s₄,X₄,R₄⟫ₐ
-                     → (forall s₁ X₁ R₁ s₂ X₂ R₂,
+                     → (∀ s₁ X₁ R₁ s₂ X₂ R₂,
                           ⟪s₁,X₁,R₁⟫ₐ
                         → ⟪s₂,X₂,R₂⟫ₐ
                         → (⟪s₁,X₁,R₁⟫,⟪s₂,X₂,R₂⟫) ≺₂ (⟪s₃,X₃,R₃⟫,⟪s₄,X₄,R₄⟫)
@@ -254,7 +248,9 @@ Section af_easier_ind.
             (Y : Type) (T : rel₂ Y)
             .
 
-  Theorem af_easier_ind : af R → af T → Q R T.
+  (* This is the easier (lexicographic) induction principle for two
+     af relations, Base-bounded *)
+  Theorem af_easier_induction : af R → af T → Q R T.
   Proof.
     intros HR HT.
     generalize (wf_upto_lex_prod wf_upto_lt_afw wf_upto_lt_afw); intros E.
@@ -283,6 +279,5 @@ Module af_lex_notations.
      (af_easier (⟪a,b,c⟫,⟪a',b',c'⟫) (⟪x,y,z⟫,⟪x',y',z'⟫)).
 
 End af_lex_notations.
-
 
 

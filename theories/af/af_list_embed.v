@@ -42,7 +42,7 @@ Section af_list_embed.
   Corollary af_list_embed : af R → af (list_embed R).
   Proof.
     intros H; generalize (af_utree_embed af_unit H); clear H.
-    af rel morph (fun x y => u2l x = y).
+    af rel morph (λ x y, u2l x = y).
     + apply u2l_surj.
     + intros s t ? ? <- <-.
       induction 1 as [ ? ? -> | | ]; simpl; auto with list_db.

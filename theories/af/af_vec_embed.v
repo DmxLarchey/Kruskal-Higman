@@ -24,11 +24,11 @@ Section list_embed_vec_embed.
   Variables (X Y : Type) (R : X → Y → Prop).
 
   Fact list_embed_vec_embed l m :
-     list_embed R l m → vec_embed R (list_vec l) (list_vec m).
+       list_embed R l m → vec_embed R (list_vec l) (list_vec m).
   Proof. induction 1; simpl; eauto with vec_db. Qed.
 
   Fact list_embed_vec_embed_rev n (v : vec _ n) m (w : vec _ m) :
-    list_embed R (vec_list v) (vec_list w) → vec_embed R v w.
+       list_embed R (vec_list v) (vec_list w) → vec_embed R v w.
   Proof.
     intros H.
     apply list_embed_vec_embed in H.
@@ -41,7 +41,7 @@ Section list_embed_vec_embed.
   Qed.
 
   Fact vec_embed_iff_list_embed n (v : vec _ n) m (w : vec _ m) :
-    vec_embed R v w ↔ list_embed R (vec_list v) (vec_list w).
+       vec_embed R v w ↔ list_embed R (vec_list v) (vec_list w).
   Proof.
     split.
     + induction 1; simpl; auto with list_db.
@@ -49,7 +49,7 @@ Section list_embed_vec_embed.
   Qed.
 
   Fact list_embed_iff_vec_embed l m :
-     list_embed R l m ↔ vec_embed R (list_vec l) (list_vec m).
+       list_embed R l m ↔ vec_embed R (list_vec l) (list_vec m).
   Proof.
     split.
     + apply list_embed_vec_embed.
@@ -71,10 +71,9 @@ Section af_lvec_embed.
   Theorem af_lvec_embed : af (lvec_embed R).
   Proof.
     generalize (af_list_embed HR).
-    af rel morph (fun l v => l = vec_list (lvec_vec v)).
-    + intros (n & v); simpl; eauto.
-    + intros l m (i & u) (j & v); simpl.
-      intros -> ->; apply vec_embed_iff_list_embed.
+    af rel morph (λ l v, l = vec_list (lvec_vec v)).
+    + intros []; simpl; eauto.
+    + intros ? ? [] []; simpl; intros -> ->; apply vec_embed_iff_list_embed.
   Qed.
 
 End af_lvec_embed.
