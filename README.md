@@ -54,14 +54,19 @@ The proof proceeds as following (sketch):
     - hence `af R'` where `R' := R + T ⨉ (utree_embed R T)↑τ` (by Coquand's [`af_product,af_sum`](https://github.com/DmxLarchey/Kruskal-AlmostFull/blob/main/theories/af/af_tools.v))
     - `af T'` where `T' := T↑α` (because `T ⊆ T'`  holds)
     - hence `af (utree_embed R' T')` (because `T' = T↑α` is smaller than `T` and the lexicographic product)
-6. finally we transfer `af` through `af (utree_embed R' T↑α) → af (utree_embed R T)↑⟨α|τ⟩₁`
+6. finally we transfer `af` through `af (utree_embed R' T') → af (utree_embed R T)↑⟨α|τ⟩₁`
    using a [quasi-morphism](theories/af/af_quasi_morphism.v) of which the construction
-   composes most of contents of the file [`af/af_utree_embed_fun.v`](theories/af/af_utree_embed_fun.v).
+   composes most of contents of the file [`af/af_utree_embed_fun.v`](theories/af/af_utree_embed_fun.v);
+7. there is also version if that proof with [_a relational quasi morphism_](theories/af/af_utree_embed_rel.v)
+   to illustrate the differences with the functional version above.
+    - indeed Higman's theorem and Kruskal's tree theorem are only reasonably implementable with a 
+      relational version and this project is an introduction to those more involved proofs, 
+      but with a similar sketch.
 
 # Higman's lemma for lists
 
-Using the isomorphism between `list X` and `utree unit X` (ie lists are just unary trees where
-there is no information on the leaves).
+Using the isomorphism between `list X` and `utree unit X`. Indeed, lists are just unary trees where
+there is no information (eg of type `unit`) on the leaves.
 
 ```coq
 Inductive list_embed {X Y} (R : X → Y → Prop) : list X → list Y → Prop :=
