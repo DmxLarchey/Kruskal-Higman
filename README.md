@@ -25,15 +25,13 @@ which is (IMHO) the reference pen-and-paper work of the matter.
 
 We define _(decorated) unary trees_ and the _(product) embedding_ between those:
 ```coq
-Variables (X Y : Type).
-
-Inductive utree := ⟨ _ : X ⟩₀ | ⟨ _ : Y | _ : utree X Y ⟩₁.
+Inductive utree X Y := ⟨ _ : X ⟩₀ | ⟨ _ : Y | _ : utree X Y ⟩₁.
   
-Inductive utree_embed R T : utree X Y → utree X Y → Prop :=
+Inductive utree_embed {X Y} R T : utree X Y → utree X Y → Prop :=
   | utree_embed_leaf x₁ x₂ : R x₁ x₂ → ⟨x₁⟩₀ ≤ₑ ⟨x₂⟩₀
   | utree_embed_subt s y t : s ≤ₑ t → s ≤ₑ ⟨y|t⟩₁
   | utree_embed_root y₁ t₁ y₂ t₂ : T y₁ y₂ → t₁ ≤ₑ t₂ → ⟨y₁|t₁⟩₁ ≤ₑ ⟨y₂|t₂⟩₁
-where "s ≤ₑ t" := (@utree_embed _ _ s t).
+where "s ≤ₑ t" := (utree_embed _ _ s t).
 ```
 
 Higman's theorem for `utree X Y` is [stated and proved](heories/af/af_utree_embed.v) as following:
@@ -42,13 +40,14 @@ Theorem af_utree_embed X Y (R : rel₂ X) (R : rel₂ Y) : af R → af T → af 
 ```
 
 The proof proceeds as following (sketch):
-1. first a lexicographic induction on the _AF-complexity_ of `(af T,af R)`. How this is implemented
-   here is a bit complicated because it is a downgrade for the case of a list `[af Rₙ;...;af R₁]`
-   of almost ful predicates (see [`af/af_lex.v`](theories/af/af_lex.v));
-2. this lexicographic can just be implemented by nested induction with `utree X Y` where `n=2`;
+1. first a lexicographic induction on a kind of _measure of the AF-complexity_ of `(af T,af R)`. 
+   How this is implemented here is a bit complicated because it is a downgrade for 
+   the case of a list `[af Rₙ;...;af R₁]` of almost full predicates ordered using the
+   _easier ordering of \[1\]_ (see [`af/af_lex.v`](theories/af/af_lex.v));
+    - this lexicographic could just be implemented by nested induction with `utree X Y` where `n=2`;
 3. apply the second constructor of `af`. One needs to prove `af (utree_embed R T)↑t` for
-   any `t : utree X Y`. Proceed by structural induction on `t`. 
-4. Here we consider only the more complicated case where `t = ⟨α|τ⟩₁` where `α : Y` and `τ : utree X Y`;
+   any `t : utree X Y`. We proceed by structural induction on `t`. 
+    - here we consider only the more complicated case where `t = ⟨α|τ⟩₁` where `α : Y` and `τ : utree X Y`;
 5. the following propositions hold (see [`af/af_utree_embed_fun.v`](theories/af/af_utree_embed_fun.v)):
     - `af (utree_embed R T)↑τ` (by induction on `t`)
     - hence `af R'` where `R' := R + T ⨉ (utree_embed R T)↑τ` (by Ramsey)
