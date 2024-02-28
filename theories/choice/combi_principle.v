@@ -10,9 +10,6 @@
 From Coq
   Require Import List Utf8.
 
-From KruskalTrees
-  Require Import notations list_utils.
-
 From KruskalFinite
   Require Import finite choice.
 
@@ -47,7 +44,7 @@ Proof.
         + apply fin_FAN.
         + intros c Hc.
           destruct (HPB (x::c)) as [ | (? & [<- | ] & ?) ]; eauto. }
-    apply list_choice in H as [ | (x & ? & [ (c & []) | (m & []) ]%IHlw) ].
+    apply fin_choice in H as [ | (x & ? & [ (c & []) | (m & []) ]%IHlw) ]; fin auto.
     * right; exists w; eauto.
     * left; exists (x::c); eauto.
     * right; exists m; eauto.
