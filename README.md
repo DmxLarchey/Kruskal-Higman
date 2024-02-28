@@ -33,14 +33,14 @@ Theorem af_list_embed X (R : rel₂ X) : af R → af (list_embed R).
 ```
 
 We derive Higman's lemma [as stated on Wikipedia](https://en.wikipedia.org/w/index.php?title=Higman%27s_lemma&oldid=841018000)
-where the sub-list relation is abstracted by assuming its inductive rules. This allows the statement to be independent of
-and external inductive definition:
+where the sub-list relation `≼` is abstracted by assuming its inductive rules. This allows the statement to be independent of
+an external inductive definition:
 ```coq
-Variables (X : Type) (≤ₛₗ : rel₂ (list X))
+Variables (X : Type) (≼ : rel₂ (list X))
           (_ : ∃ l, ∀x : X, x ∈ l) 
-          (_ :                      [] ≤ₛₗ [])
-          (_ : ∀ x l m, l ≤ₛₗ m → x::l ≤ₛₗ x::m)
-          (_ : ∀ x l m, l ≤ₛₗ m →    l ≤ₛₗ x::m).
+          (_ :                    [] ≼ [])
+          (_ : ∀ x l m, l ≼ m → x::l ≼ x::m)
+          (_ : ∀ x l m, l ≼ m →    l ≼ x::m).
 
-Theorem Higman_lemma : ∀ f : nat → list X, ∃ i j, i < j ∧ fᵢ ≤sl fⱼ.
+Theorem Higman_lemma : ∀ f : nat → list X, ∃ i j, i < j ∧ fᵢ ≼ fⱼ.
 ```
