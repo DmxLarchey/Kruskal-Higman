@@ -52,10 +52,11 @@ The proof proceeds as following (sketch):
 5. the following propositions hold (see [`af/af_utree_embed_fun.v`](theories/af/af_utree_embed_fun.v)):
     - `af (utree_embed R T)↑τ` (by induction on `t`)
     - hence `af R'` where `R' := R + T ⨉ (utree_embed R T)↑τ` (by Ramsey)
-    - `af T↑α` (because `af T` holds)
-    - hence `af (utree_embed R' T↑α)` (because `T↑α` is smaller than `T`)
+    - `af T'` where `T' := T↑α` (because `T ⊆ T'`  holds)
+    - hence `af (utree_embed R' T')` (because `T' = T↑α` is smaller than `T` and the lexicographic product)
 6. finally we transfer `af` through `af (utree_embed R' T↑α) → af (utree_embed R T)↑⟨α|τ⟩₁`
-   using a [quasi-morphism](theories/af/af_quasi_morphism.v).
+   using a [quasi-morphism](theories/af/af_quasi_morphism.v) of which the construction
+   composes most of contents of the file [`af/af_utree_embed_fun.v`](theories/af/af_utree_embed_fun.v).
 
 # Higman's lemma for lists
 
