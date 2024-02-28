@@ -36,7 +36,7 @@ where "s ≤ₑ t" := (utree_embed _ _ s t).
 
 Higman's theorem for `utree X Y` is [stated and proved](heories/af/af_utree_embed.v) as following:
 ```coq
-Theorem af_utree_embed X Y (R : rel₂ X) (R : rel₂ Y) : af R → af T → af (utree_embed R T). 
+Theorem af_utree_embed X Y (R : rel₂ X) (T : rel₂ Y) : af R → af T → af (utree_embed R T). 
 ```
 
 The proof proceeds as following (sketch):
@@ -44,13 +44,14 @@ The proof proceeds as following (sketch):
    How this is implemented here is a bit complicated because it is a downgrade for 
    the case of a list `[af Rₙ;...;af R₁]` of almost full predicates ordered using the
    _easier ordering of \[1\]_ (see [`af/af_lex.v`](theories/af/af_lex.v));
-    - this lexicographic could just be implemented by nested induction with `utree X Y` where `n=2`;
+    - alternatively for `utree X Y` where `n=2`, this lexicographic ordering could
+      just be implemented by nested induction, first on `af T`, then on `af R`;
 3. apply the second constructor of `af`. One needs to prove `af (utree_embed R T)↑t` for
    any `t : utree X Y`. We proceed by structural induction on `t`. 
     - here we consider only the more complicated case where `t = ⟨α|τ⟩₁` where `α : Y` and `τ : utree X Y`;
 5. the following propositions hold (see [`af/af_utree_embed_fun.v`](theories/af/af_utree_embed_fun.v)):
     - `af (utree_embed R T)↑τ` (by induction on `t`)
-    - hence `af R'` where `R' := R + T ⨉ (utree_embed R T)↑τ` (by Ramsey)
+    - hence `af R'` where `R' := R + T ⨉ (utree_embed R T)↑τ` (by Coquand's [`af_product,af_sum`](https://github.com/DmxLarchey/Kruskal-AlmostFull/blob/main/theories/af/af_tools.v))
     - `af T'` where `T' := T↑α` (because `T ⊆ T'`  holds)
     - hence `af (utree_embed R' T')` (because `T' = T↑α` is smaller than `T` and the lexicographic product)
 6. finally we transfer `af` through `af (utree_embed R' T↑α) → af (utree_embed R T)↑⟨α|τ⟩₁`
