@@ -12,10 +12,11 @@
 # What is this library?
 
 This library is an extension of [`Kruskal-AlmostFull`](https://github.com/DmxLarchey/Kruskal-AlmostFull).
-It contains an detailed and expanded constructive/inductive proofs of:
+It contains a detailed and expanded constructive/inductive proofs of:
 - Higman's theorem for unary trees (according to the terminology of \[1\]);
-- and as a consequence, [Higman's lemma](#Higman's_lemma_for_lists).
+- and as a consequence, [Higman's lemma](#Higmans-lemma-for-lists).
 
+This `README` itself contains the outline of the proof with the critical steps.
 The terminology and proof structure are largely inspired from Wim Veldman's \[1\] 
 which is (IMHO) the reference pen-and-paper work on this proof technique.
 
