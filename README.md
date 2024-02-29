@@ -62,12 +62,84 @@ The proof proceeds as following (sketch):
     - indeed Higman's theorem and Kruskal's tree theorem are only reasonably implementable with a 
       relational version and this project is an introduction to those more involved proofs, 
       but with a similar sketch.
+      
+# The quasi morphism `af (utree_embed R' T') → af (utree_embed R T)↑⟨α|τ⟩₁`
+
+We study the case where the induction on `t` above is a unary tree `⟨α|τ⟩₁` and
+also when `∀y, af T↑y` holds. In particular we have `af T↑α`. Recall the following definitions:
+```coq
+X' := X + Y ⨉ utree X Y
+Y' := Y
+R' := R + T ⨉ (utree_embed R T)↑τ
+T' := T↑α
+```
+As argued above, `af (utree_embed R' T')` can be establish using (the consequences of) Ramsey's theorem
+and the induction hypotheses available.
+
+We build an _evaluation/analysis_ pair as a single binary relation between the types
+`utree X' Y'` (the analyses) and `utree X Y` (the evaluations). In the simple case 
+of `utree`(s), that can be implemented directly as evaluation _function_. 
+In the more complicated case of Kruskal's theorem (roses trees),
+we will really need to view the evaluation/analysis as a relation between analyses and
+evaluations. So here we write `==>` for this evaluation relation.
+
+Terms in the type `X` are either of the form 
+- `⦗x⦘₁` with `x : X`;
+- or `⦗y,t⦘₂` with `(y : Y)` and `t : utree X Y`.
+Evaluation consists in replacing a leaf by a sub-tree (recursively), if it is
+of shape `⦗y,t⦘₂` hence, we get the following rules for the evaluation relation:
+```coq
+                                                      t' ==> t
+ ------------------   -----------------------   --------------------
+  ⟨⦗x⦘₁⟩₀ ==> ⟨x⟩₀     ⟨⦗y,t⦘₂⟩₀  ==> ⟨y|t⟩₁     ⟨y|t'⟩₁ ==> ⟨y|t⟩₁
+```
+but in the simple case of `utree`, these can also be implemented as the following fixpoint equations:
+```coq
+ev ⟨⦗x⦘₁⟩₀ = ⟨x⟩₀
+ev ⟨⦗y,t⦘₂⟩₀ = ⟨y|t⟩₁
+ev ⟨y|t'⟩₁ = ⟨y|ev t⟩₁
+```
+One can understand the analyses as ways to displace information in an evaluation.
+Nothing can be done at leaves but at a node of arity 1, it is possible to cut
+the tree there, and hide the sub-tree into a new leaf. For instance,
+the  `⟨1|⟨2|⟨0⟩₀⟩₁⟩₁ : utree nat nat` can be analyzed as:
+- `⟨⦗1,⟨2|⟨0⟩₀⟩₁⦘₂⟩₀`
+- `⟨1|⟨⦗2,⟨0⟩₀⦘₂⟩₀⟩₁`
+- `⟨1|⟨2|⟨⦗0⦘₁⟩₀⟩₁⟩₁`
+in the type `utree (nat+nat*utree nat nat) nat`. 
+This can look simple here because unary trees are _linear_ but imagine what is
+going on when the arity (number of sons) is allowed to be larger than 2. Then
+there is an exponential number of ways to analyses (displace information).
+However one can show that there are only finitely many ways to do it.
+
+Then we say that an analysis in `utree X' Y'` is _disappointing_ if either:
+- it is of shape `⟨y|_⟩₁` with `T α y`
+- or of shape `⟨⦗_,t⦘₂⟩₀` with `utree_embed R T τ t`
+and an analysis is _exceptional_ (denoted `E t'`) if it contains a disappointing sub-tree.
+We say that an evaluation is _exceptional_ (and write `E t`) if all its analyses are exceptional,
+ie. `E t := ∀t', t' ==> t  →  E' t'`.
+
+We show the three following properties for `ev` and `E'/E`:
+1. `fin(λ t', t' ==> t)` (`ev` has finite inverse image);
+2. `utree_embed R' T' s' t' → utree_embed R T (ev s') (ev t') ∨ E' s'` (quasi morphism)
+3. `E t → utree_embed R T ⟨α|τ⟩₁ t` (exceptional evalutations embed `⟨α|τ⟩₁`)
+Actually, Item 3 hold in both directions but this is not need.
+These 3 items are the conditions that constitute a _quasi morphism_
+(see [`af/af_quasi_morhism.v`](theories/af/af_quasi_morhism.v)) 
+and thus enable the transfer of the `af` property.
+
+All this construction is performed:
+- in a functional form in [`af/af_utree_embed_fun.v`](theories/af/af_utree_embed_fun.v);
+- and in relational form in [`af/af_utree_embed_rel.v`](theories/af/af_utree_embed_rel.v);
+
+They describe in the simple case of unary trees the same steps that will
+also be performed for Kruskal's tree theorem.
 
 # Higman's lemma for lists
 
-Using the isomorphism between `list X` and `utree unit X`. Indeed, lists are just unary trees where
-there is no information (eg of type `unit`) on the leaves.
-
+Lists are just unary trees where there is no information (eg of type `unit`) on the leaves.
+Hence there is an isomorphism between `list X` and `utree unit X` that we use as
+ relational morphism to transfer `af_utree_embed` to lists.
 ```coq
 Inductive list_embed {X Y} (R : X → Y → Prop) : list X → list Y → Prop :=
   | list_embed_nil :           [] ≤ₗ []
