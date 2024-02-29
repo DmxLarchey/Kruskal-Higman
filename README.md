@@ -41,7 +41,7 @@ Theorem af_utree_embed X Y (R : rel₂ X) (T : rel₂ Y) : af R → af T → af 
 ```
 
 The proof proceeds as following (sketch):
-1. first a lexicographic induction on a kind of _measure of the AF-complexity_ of `(af T,af R)`. 
+1. first a [lexicographic induction](#Lexicographic-induction-on-AF-predicates) on a kind of _measure of the AF-complexity_ of `(af T,af R)`. 
    How this is implemented here is a bit complicated because it is a downgrade for 
    the case of a list `[af Rₙ;...;af R₁]` of almost full predicates ordered using the
    _easier ordering of \[1\]_ (see [`af/af_lex.v`](theories/af/af_lex.v));
@@ -170,3 +170,12 @@ Variables (X : Type) (≼ : rel₂ (list X))
 
 Theorem Higman_lemma : ∀ f : nat → list X, ∃ i j, i < j ∧ fᵢ ≼ fⱼ.
 ```
+
+# Lexicographic induction on AF predicates
+
+__To be completed__, the reference files being:
+- [`wf/wf_upto.v`](theories/wf/wf_upto.v) which defines the notion of _well foundedness up to a projection_ and shows that it is closed
+  under lexicographic products;
+- [`af/af_lex.v`](theories/af/af_lex.v)) which show how to transform almost fullness in well foundedness up to a projection
+  and then derives the _easier \[1\]_ lexicographic induction principle for pairs of AF relations.
+ 
