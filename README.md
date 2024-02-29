@@ -76,18 +76,19 @@ T' := T↑α
 As argued above, `af (utree_embed R' T')` can be establish using (the consequences of) Ramsey's theorem
 and the induction hypotheses available.
 
-We build an _evaluation/analysis_ pair as a single binary relation between the types
+We build an _evaluation/analysis_ pair as a _single binary relation_ between the types
 `utree X' Y'` (the analyses) and `utree X Y` (the evaluations). In the simple case 
 of `utree`(s), that can be implemented directly as evaluation _function_. 
-In the more complicated case of Kruskal's theorem (roses trees),
+In the more complicated case of Kruskal's theorem (for roses trees),
 we will really need to view the evaluation/analysis as a relation between analyses and
 evaluations. So here we write `==>` for this evaluation relation.
 
-Terms in the type `X` are either of the form 
+Terms in the type `X'` are either of the form 
 - `⦗x⦘₁` with `x : X`;
 - or `⦗y,t⦘₂` with `(y : Y)` and `t : utree X Y`.
-Evaluation consists in replacing a leaf by a sub-tree (recursively), if it is
-of shape `⦗y,t⦘₂` hence, we get the following rules for the evaluation relation:
+
+Evaluation consists in (recursively) replacing a leaf by a sub-tree, if it is
+of shape `⦗y,t⦘₂`. Hence, we get the following rules for the evaluation relation:
 ```coq
                                                       t' ==> t
  ------------------   -----------------------   --------------------
@@ -101,12 +102,14 @@ ev ⟨y|t'⟩₁ = ⟨y|ev t⟩₁
 ```
 One can understand the analyses as ways to displace information in an evaluation.
 Nothing can be done at leaves but at a node of arity 1, it is possible to cut
-the tree there, and hide the sub-tree into a new leaf. For instance,
+the `utree` there, and hide the sub-tree into a new leaf. For instance,
 the  `⟨1|⟨2|⟨0⟩₀⟩₁⟩₁ : utree nat nat` can be analyzed as:
 - `⟨⦗1,⟨2|⟨0⟩₀⟩₁⦘₂⟩₀`
 - `⟨1|⟨⦗2,⟨0⟩₀⦘₂⟩₀⟩₁`
 - `⟨1|⟨2|⟨⦗0⦘₁⟩₀⟩₁⟩₁`
-in the type `utree (nat+nat*utree nat nat) nat`. 
+
+in the type `utree (nat+nat*utree nat nat) nat`.
+
 This can look simple here because unary trees are _linear_ but imagine what is
 going on when the arity (number of sons) is allowed to be larger than 2. Then
 there is an exponential number of ways to analyses (displace information).
