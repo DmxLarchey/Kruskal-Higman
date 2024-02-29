@@ -63,9 +63,10 @@ The proof proceeds as following (sketch):
       relational version and this project is an introduction to those more involved proofs, 
       but with a similar sketch.
       
-# The quasi morphism `af (utree_embed R' T') → af (utree_embed R T)↑⟨α|τ⟩₁`
+# The quasi-morphism 
 
-We study the case where the induction on `t` above is a unary tree `⟨α|τ⟩₁` and
+We describe the quasi-morphism that implements the following transfer `af (utree_embed R' T') → af (utree_embed R T)↑⟨α|τ⟩₁`.
+Recall that we are in the case where the induction on `t` above is a unary tree `⟨α|τ⟩₁` and
 also when `∀y, af T↑y` holds. In particular we have `af T↑α`. Recall the following definitions:
 ```coq
 X' := X + Y ⨉ utree X Y
