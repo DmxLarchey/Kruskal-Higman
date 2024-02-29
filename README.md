@@ -119,6 +119,7 @@ However one can show that there are only finitely many ways to do it.
 Then we say that an analysis in `utree X' Y'` is _disappointing_ if either:
 - it is of shape `⟨y|_⟩₁` with `T α y`
 - or of shape `⟨⦗_,t⦘₂⟩₀` with `utree_embed R T τ t`
+
 and an analysis is _exceptional_ (denoted `E t'`) if it contains a disappointing sub-tree.
 We say that an evaluation is _exceptional_ (and write `E t`) if all its analyses are exceptional,
 ie. `E t := ∀t', t' ==> t  →  E' t'`.
@@ -126,18 +127,20 @@ ie. `E t := ∀t', t' ==> t  →  E' t'`.
 We show the three following properties for `ev` and `E'/E`:
 1. `fin(λ t', t' ==> t)` (`ev` has finite inverse image);
 2. `utree_embed R' T' s' t' → utree_embed R T (ev s') (ev t') ∨ E' s'` (quasi morphism)
-3. `E t → utree_embed R T ⟨α|τ⟩₁ t` (exceptional evalutations embed `⟨α|τ⟩₁`)
-Actually, Item 3 hold in both directions but this is not need.
+3. `E t → utree_embed R T ⟨α|τ⟩₁ t` (exceptional evaluations embed `⟨α|τ⟩₁`)
+
+Actually, Item 3 holds in both directions but this is not needed.
 These 3 items are the conditions that constitute a _quasi morphism_
 (see [`af/af_quasi_morhism.v`](theories/af/af_quasi_morhism.v)) 
 and thus enable the transfer of the `af` property.
 
 All this construction is performed:
-- in a functional form in [`af/af_utree_embed_fun.v`](theories/af/af_utree_embed_fun.v);
-- and in relational form in [`af/af_utree_embed_rel.v`](theories/af/af_utree_embed_rel.v);
+- in a functional form in [`af/af_utree_embed_fun.v`](theories/af/af_utree_embed_fun.v) and heavily commented;
+- and in relational form in [`af/af_utree_embed_rel.v`](theories/af/af_utree_embed_rel.v) (not really commented);
 
-They describe in the simple case of unary trees the same steps that will
-also be performed for Kruskal's tree theorem.
+They describe in the simple case of unary trees `utree` the very same steps that will
+also be performed for Kruskal's tree theorem, but the general setting is more complicated
+because the analysis/evaluation relation is much harder to implement.
 
 # Higman's lemma for lists
 
