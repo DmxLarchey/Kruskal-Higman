@@ -14,12 +14,12 @@
 This library is an extension of [`Kruskal-AlmostFull`](https://github.com/DmxLarchey/Kruskal-AlmostFull).
 It contains an detailed and expanded constructive/inductive proofs of:
 - Higman's theorem for unary trees (according to the terminology of \[1\]);
-- and as a consequence, [Higman's lemma](#Higman's lemma for lists).
+- and as a consequence, [Higman's lemma](#Higman's_lemma_for_lists).
 
 The terminology and proof structure are largely inspired from Wim Veldman's \[1\] 
-which is (IMHO) the reference pen-and-paper work of the matter.
+which is (IMHO) the reference pen-and-paper work on this proof technique.
 
-\[1\]. [_An intuitionistic proof of Kruskal's theorem_](https://link.springer.com/article/10.1007/s00153-003-0207-x), Win Veldman, 2004
+\[1\]. [_An intuitionistic proof of Kruskal's theorem_](https://link.springer.com/article/10.1007/s00153-003-0207-x), Wim Veldman, 2004
 
 # The proof of Higman theorem for unary trees (sketch)
 
