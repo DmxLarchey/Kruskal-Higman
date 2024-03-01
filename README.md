@@ -33,8 +33,8 @@ opam install coq-kruskal-higman
 
 Notice that to import it in a development, as with `Kruskal-AlmostFull`, one should
 consistently choose between:
-- the `Prop`-bounded version accessed via eg `Require Import KruskalHigmanProp`;
-- or the `Type`-bounded version via eg `Require Import KruskalHigmanType`.
+- the `Prop`-bounded version accessed via eg `From KruskalHigmanProp Require ...`;
+- or the `Type`-bounded version via eg `From KruskalHigmanType Require ...`.
 
 Mixing both versions is possible is possible but hard and not recommended due 
 to the total overlap of the namespaces except for the prefixes `KruskalHigman{Prop,Type}`.
