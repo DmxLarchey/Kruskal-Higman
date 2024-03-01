@@ -28,7 +28,7 @@ It can be installed via `opam` since release `v1.0` is now include into [`coq-op
 ```console
 opam repo add coq-released https://coq.inria.fr/opam/released
 opam update
-opam install coq-kruskal-higman.1.0
+opam install coq-kruskal-higman
 ```
 
 Notice that to import it in a development, as with `Kruskal-AlmostFull`, one should
