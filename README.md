@@ -21,6 +21,23 @@ which is (IMHO) the reference pen-and-paper work of the matter.
 
 \[1\]. [_An intuitionistic proof of Kruskal's theorem_](https://link.springer.com/article/10.1007/s00153-003-0207-x), Win Veldman, 2004
 
+# How to install `Kruskal-Higman`
+
+It can be installed via `opam` since release `v1.0` is now include into [`coq-opam`](https://github.com/coq/opam).
+```console
+opam repo add coq-released https://coq.inria.fr/opam/released
+opam update
+opam install coq-kruskal-higman.1.0
+```
+
+Notice that to import it in a development, as with `Kruskal-AlmostFull`, one should
+consistently choose between:
+- the `Prop`-bounded version accessed via eg `Require Import KruskalHigmanProp`;
+- or the `Type`-bounded version via eg `Require Import KruskalHigmanType`.
+
+Mixing both versions is possible is possible but hard and not recommended due 
+to the total overlap of the namespaces except for the prefixes `KruskalHigman{Prop,Type}`.
+
 # The proof of Higman theorem for unary trees (sketch)
 
 We define _(decorated) unary trees_ and the _(product) embedding_ between those:
