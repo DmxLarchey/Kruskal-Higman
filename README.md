@@ -75,9 +75,9 @@ The proof proceeds as following (sketch):
 6. finally we transfer `af` through `af (utree_embed R' T') → af (utree_embed R T)↑⟨α|τ⟩₁`
    using a [quasi-morphism](theories/af/af_quasi_morphism.v) of which the construction
    composes most of contents of the file [`af/af_utree_embed_fun.v`](theories/af/af_utree_embed_fun.v);
-7. there is also version if that proof with [_a relational quasi morphism_](theories/af/af_utree_embed_rel.v)
+7. there is also version of that proof with [_a relational quasi morphism_](theories/af/af_utree_embed_rel.v)
    to illustrate the differences with the functional version above.
-    - indeed Higman's theorem and Kruskal's tree theorem are only reasonably implementable with a 
+    - indeed Kruskal's tree theorem is only reasonably implementable with a 
       relational version and this project is an introduction to those more involved proofs, 
       but with a similar sketch.
       
