@@ -156,7 +156,7 @@ and thus enable the transfer of the `af` property.
 
 All this construction is performed:
 - in a functional form in [`af/af_utree_embed_fun.v`](theories/af/af_utree_embed_fun.v) and heavily commented;
-- and in relational form in [`af/af_utree_embed_rel.v`](theories/af/af_utree_embed_rel.v) (not really commented);
+- and in relational form in [`af/af_utree_embed_rel.v`](theories/af/af_utree_embed_rel.v) (lightly commented);
 
 They describe in the simple case of unary trees `utree` the very same steps that will
 also be performed for Kruskal's tree theorem, but the general setting is more complicated
