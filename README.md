@@ -52,7 +52,7 @@ Inductive utree_embed {X Y} R T : utree X Y → utree X Y → Prop :=
 where "s ≤ₑ t" := (utree_embed _ _ s t).
 ```
 
-Higman's theorem for `utree X Y` is [stated and proved](heories/af/af_utree_embed.v) as following:
+Higman's theorem for `utree X Y` is [stated and proved](theories/af/af_utree_embed.v) as following:
 ```coq
 Theorem af_utree_embed X Y (R : rel₂ X) (T : rel₂ Y) : af R → af T → af (utree_embed R T). 
 ```
