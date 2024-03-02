@@ -100,7 +100,7 @@ We build an _evaluation/analysis_ pair as a _single binary relation_ between the
 of `utree`(s), that can be implemented directly as evaluation _function_. 
 In the more complicated case of Kruskal's theorem (for roses trees),
 we will really need to view the evaluation/analysis as a relation between analyses and
-evaluations. So here we write `==>` for this evaluation relation.
+evaluations. So here we write `⤇` for this evaluation relation.
 
 Terms in the type `X'` are either of the form 
 - `⦗x⦘₁` with `x : X`;
@@ -109,9 +109,9 @@ Terms in the type `X'` are either of the form
 Evaluation consists in (recursively) replacing a leaf by a sub-tree, if it is
 of shape `⦗y,t⦘₂`. Hence, we get the following rules for the evaluation relation:
 ```coq
-                                                      t' ==> t
- ------------------   -----------------------   --------------------
-  ⟨⦗x⦘₁⟩₀ ==> ⟨x⟩₀     ⟨⦗y,t⦘₂⟩₀  ==> ⟨y|t⟩₁     ⟨y|t'⟩₁ ==> ⟨y|t⟩₁
+                                                 t' ⤇ t
+ -----------------   --------------------   ------------------
+  ⟨⦗x⦘₁⟩₀ ⤇ ⟨x⟩₀     ⟨⦗y,t⦘₂⟩₀ ⤇ ⟨y|t⟩₁    ⟨y|t'⟩₁ ⤇ ⟨y|t⟩₁
 ```
 but in the simple case of `utree`, these can also be implemented as the following fixpoint equations:
 ```coq
@@ -119,6 +119,8 @@ ev ⟨⦗x⦘₁⟩₀ = ⟨x⟩₀
 ev ⟨⦗y,t⦘₂⟩₀ = ⟨y|t⟩₁
 ev ⟨y|t'⟩₁ = ⟨y|ev t⟩₁
 ```
+hence in this simple case we have: `t' ⤇ t ↔ ev t' = t`.
+
 One can understand the analyses as ways to displace information in an evaluation.
 Nothing can be done at leaves but at a node of arity 1, it is possible to cut
 the `utree` there, and hide the sub-tree into a new leaf. For instance,
@@ -140,11 +142,11 @@ Then we say that an analysis in `utree X' Y'` is _disappointing_ if either:
 
 and an analysis is _exceptional_ (denoted `E t'`) if it contains a disappointing sub-tree.
 We say that an evaluation is _exceptional_ (and write `E t`) if all its analyses are exceptional,
-ie. `E t := ∀t', t' ==> t  →  E' t'`.
+ie. `E t := ∀t', t' ⤇ t  →  E' t'`.
 
-We show the three following properties for `ev` and `E'/E`:
-1. `fin(λ t', t' ==> t)` (`ev` has finite inverse image);
-2. `utree_embed R' T' s' t' → utree_embed R T (ev s') (ev t') ∨ E' s'` (quasi morphism)
+We show the three following properties for `⤇` (or `ev`) and `E'/E`:
+1. `fin(λ t', t' ⤇ t)` (`ev` has finite inverse image);
+2. `utree_embed R' T' s' t' → s' ⤇ s → t' ⤇ t → utree_embed R T s t ∨ E' s'` (quasi morphism)
 3. `E t → utree_embed R T ⟨α|τ⟩₁ t` (exceptional evaluations embed `⟨α|τ⟩₁`)
 
 Actually, Item 3 holds in both directions but this is not needed.
