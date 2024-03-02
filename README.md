@@ -36,7 +36,7 @@ consistently choose between:
 - the `Prop`-bounded version accessed via eg `From KruskalHigmanProp Require ...`;
 - or the `Type`-bounded version via eg `From KruskalHigmanType Require ...`.
 
-Mixing both versions is possible is possible but hard and not recommended due 
+Mixing both versions is possible but hard and not recommended due 
 to the total overlap of the namespaces except for the prefixes `KruskalHigman{Prop,Type}`.
 
 # The proof of Higman theorem for unary trees (sketch)
