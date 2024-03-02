@@ -159,8 +159,8 @@ All this construction is performed:
 - and in relational form in [`af/af_utree_embed_rel.v`](theories/af/af_utree_embed_rel.v) (lightly commented);
 
 They describe in the simple case of unary trees `utree` the very same steps that will
-also be performed for Kruskal's tree theorem, but the general setting is more complicated
-because the analysis/evaluation relation is much harder to implement.
+also be performed for Kruskal's tree theorem. But for Kruskal's, the general setting is
+more complicated and the analysis/evaluation relation is much harder to implement.
 
 # Higman's lemma for lists
 
