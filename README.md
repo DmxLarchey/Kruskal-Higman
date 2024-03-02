@@ -78,8 +78,8 @@ The proof proceeds as following (sketch):
 7. there is also version of that proof with [_a relational quasi morphism_](theories/af/af_utree_embed_rel.v)
    to illustrate the differences with the functional version above.
     - indeed Kruskal's tree theorem is only reasonably implementable with a 
-      relational version and this project is an introduction to those more involved proofs, 
-      but with a similar sketch.
+      relational version and the current project is an introduction to this involved proof, 
+      but with a comparable outline.
       
 # The quasi-morphism 
 
