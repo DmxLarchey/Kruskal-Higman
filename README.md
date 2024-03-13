@@ -79,7 +79,7 @@ The proof proceeds as following (sketch):
    to illustrate the differences with the functional version above.
     - indeed Kruskal's tree theorem is only reasonably implementable with a 
       relational version and the current project is an introduction to this involved proof, 
-      but with a comparable outline.
+      but with a comparable outline, see the project [`Kruskal-Veldman`](https://github.com/DmxLarchey/Kruskal-Veldman).
       
 # The quasi-morphism 
 
