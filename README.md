@@ -87,10 +87,10 @@ We describe the quasi-morphism that implements the following transfer `af (utree
 Recall that we are in the case where the induction on `t` above is a unary tree `⟨α|τ⟩₁` and
 also when `∀y, af T↑y` holds. In particular we have `af T↑α`. Recall the following definitions:
 ```coq
-X' := X + Y ⨉ utree X Y
-Y' := Y
-R' := R + T ⨉ (utree_embed R T)↑τ
-T' := T↑α
+Arity 0                            |  Arity 1
+-----------------------------------+------------
+X' := X + Y ⨉ utree X Y            |  Y' := Y
+R' := R + T ⨉ (utree_embed R T)↑τ  |  T' := T↑α
 ```
 As argued above, `af (utree_embed R' T')` can be establish using (the consequences of) Ramsey's theorem
 and the induction hypotheses available.
