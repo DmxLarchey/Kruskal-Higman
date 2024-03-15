@@ -22,8 +22,8 @@ which is (IMHO) the reference pen-and-paper work on this proof technique.
 
 The main proof in `Kruskal-Higman`, that of `af_utree_embed` below, 
 is a written as a downgrade of the proof of [`Kruskal-Veldman`](https://github.com/DmxLarchey/Kruskal-Veldman),
-but on a much simpler case of unary trees, whereas `Kruskal-Veldman` is concerned with
-finitely branching trees, aka rose trees. 
+on a much simpler case of _unary trees_, whereas the main proof in `Kruskal-Veldman` is concerned 
+with the case of _rose trees_, aka finitely branching trees, aka . 
 
 \[1\]. [_An intuitionistic proof of Kruskal's theorem_](https://link.springer.com/article/10.1007/s00153-003-0207-x), Wim Veldman, 2004
 
