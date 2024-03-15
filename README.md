@@ -20,6 +20,11 @@ This `README` itself contains the outline of the proof with the critical steps.
 The terminology and proof structure are largely inspired from Wim Veldman's \[1\] 
 which is (IMHO) the reference pen-and-paper work on this proof technique.
 
+The main proof in `Kruskal-Higman`, that of `af_utree_embed` below, 
+is a written as a downgrade of the proof of [`Kruskal-Veldman`](https://github.com/DmxLarchey/Kruskal-Veldman),
+but on a much simpler case of unary trees, whereas `Kruskal-Veldman` is concerned with
+finitely branching trees, aka rose trees. 
+
 \[1\]. [_An intuitionistic proof of Kruskal's theorem_](https://link.springer.com/article/10.1007/s00153-003-0207-x), Wim Veldman, 2004
 
 # How to install `Kruskal-Higman`
