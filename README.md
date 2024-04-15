@@ -20,6 +20,11 @@ This `README` itself contains the outline of the proof with the critical steps.
 The terminology and proof structure are largely inspired from Wim Veldman's \[1\] 
 which is (IMHO) the reference pen-and-paper work on this proof technique.
 
+The main proof in `Kruskal-Higman`, that of `af_utree_embed` below, 
+is a written as a downgrade of the proof of [`Kruskal-Veldman`](https://github.com/DmxLarchey/Kruskal-Veldman),
+on the much simpler case of _unary trees_, whereas the main proof in `Kruskal-Veldman` is concerned 
+with the case of _rose trees_, aka finitely branching trees. 
+
 \[1\]. [_An intuitionistic proof of Kruskal's theorem_](https://link.springer.com/article/10.1007/s00153-003-0207-x), Wim Veldman, 2004
 
 # How to install `Kruskal-Higman`
@@ -79,7 +84,7 @@ The proof proceeds as following (sketch):
    to illustrate the differences with the functional version above.
     - indeed Kruskal's tree theorem is only reasonably implementable with a 
       relational version and the current project is an introduction to this involved proof, 
-      but with a comparable outline.
+      but with a comparable outline, see the project [`Kruskal-Veldman`](https://github.com/DmxLarchey/Kruskal-Veldman).
       
 # The quasi-morphism 
 
@@ -87,10 +92,10 @@ We describe the quasi-morphism that implements the following transfer `af (utree
 Recall that we are in the case where the induction on `t` above is a unary tree `⟨α|τ⟩₁` and
 also when `∀y, af T↑y` holds. In particular we have `af T↑α`. Recall the following definitions:
 ```coq
-X' := X + Y ⨉ utree X Y
-Y' := Y
-R' := R + T ⨉ (utree_embed R T)↑τ
-T' := T↑α
+Arity 0                            |  Arity 1
+-----------------------------------+------------
+X' := X + Y ⨉ utree X Y            |  Y' := Y
+R' := R + T ⨉ (utree_embed R T)↑τ  |  T' := T↑α
 ```
 As argued above, `af (utree_embed R' T')` can be establish using (the consequences of) Ramsey's theorem
 and the induction hypotheses available.
