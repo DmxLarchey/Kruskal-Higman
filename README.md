@@ -16,6 +16,10 @@ It contains a detailed and expanded constructive/inductive proofs of:
 - Higman's theorem for unary trees (according to the terminology of \[1\]);
 - and as a consequence, [Higman's lemma](#Higmans-lemma-for-lists).
 
+Some tools are also included, as required for the above proofs:
+- the [soundness theorem for _quasi-morphisms_](theories/af/af_quasi_morphism.v);
+- the [_FAN theorem_ for inductive bars](theories/af/fan.v).
+
 This `README` itself contains the outline of the proof with the critical steps.
 The terminology and proof structure are largely inspired from Wim Veldman's \[1\] 
 which is (IMHO) the reference pen-and-paper work on this proof technique.
