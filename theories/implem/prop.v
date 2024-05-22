@@ -8,3 +8,4 @@
 (**************************************************************)
 
 From KruskalAfProp Require Export base notations almost_full.
+From KruskalFanProp Require Export fan.
