@@ -16,7 +16,7 @@ From KruskalTrees
 From KruskalFinite
   Require Import finite choice.
 
-Require Import base tactics fan combi_principle.
+Require Import base tactics combi_principle.
 
 Import ListNotations lift_notations.
 

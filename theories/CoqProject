@@ -14,7 +14,6 @@ choice/choice_base.v
 
 wf/wf_upto.v
 
-af/fan.v
 af/af_lex.v
 af/af_quasi_morphism_decidable.v
 af/af_quasi_morphism.v
