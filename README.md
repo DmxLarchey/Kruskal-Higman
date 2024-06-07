@@ -18,7 +18,7 @@ It contains a detailed and expanded constructive/inductive proofs of:
 
 Some tools are also included, as required for the above proofs:
 - the [soundness theorem for _quasi-morphisms_](theories/af/af_quasi_morphism.v);
-- the [_FAN theorem_ for inductive bars](theories/af/fan.v).
+- the [_FAN theorem_ for inductive bars](https://github.com/DmxLarchey/Kruskal-Fan/blob/main/theories/af/fan.v) now part of the separate [`Kruskal-Fan`](https://github.com/DmxLarchey/Kruskal-Fan) project.
 
 This `README` itself contains the outline of the proof with the critical steps.
 The terminology and proof structure are largely inspired from Wim Veldman's \[1\] 
