@@ -26,7 +26,7 @@ Section af_quasi_morphism_decidable.
 
   Variables (X Y : Type) (ev : X → Y).
 
-  Notation ana_rel := (λ y x, ev x = y).
+  Abbreviation ana_rel := (λ y x, ev x = y).
 
   Variables (ana_fin : ∀y, fin (ana_rel y)) (* ev has finite inverse images *)
 

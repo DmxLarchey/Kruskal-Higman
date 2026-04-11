@@ -122,7 +122,7 @@ Section afw.
   (* Notation better than Definition because unification does not work well
      below otherwise, and we would need to unfold many times *)
 
-  Notation afw_forget := (λ w, snd (projT1 w)).
+  Abbreviation afw_forget := (λ w, snd (projT1 w)).
 
   Local Definition lt_afw (x y : afw) := projT1 x ≺ projT1 y.
 
@@ -211,8 +211,8 @@ End afw.
 #[local] Notation "⟪ a , b , c ⟫" := (a,existT _ b c).
 #[local] Notation "⟪ a , b , c ⟫ₐ" := (wrel₂_accepted ⟪a,b,c⟫).
 #[local] Notation "x ≺ y" := (lt_wrel₂ x y) (at level 70).
-#[local] Notation afw_witness := (λ w, fst (projT1 w)).
-#[local] Notation afw_forget  := (λ w, snd (projT1 w)).
+#[local] Abbreviation afw_witness := (λ w, fst (projT1 w)).
+#[local] Abbreviation afw_forget  := (λ w, snd (projT1 w)).
 
 #[local] Reserved Notation "x '≺₂' y" (at level 70, no associativity, format "x  ≺₂  y").
 

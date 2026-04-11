@@ -26,7 +26,7 @@ Set Implicit Arguments.
     membership. Its finiteness is not explicited but rather
     derived from KruskalFinite tools. *)
 
-#[local] Notation FAN lw := (λ c, Forall2 (λ x l, x ∈ l) c lw).
+#[local] Abbreviation FAN lw := (λ c, Forall2 (λ x l, x ∈ l) c lw).
 
 Fact fin_FAN X (lw : list (list X)) : fin (FAN lw).
 Proof. apply fin_Forall2_rev; fin auto. Qed.

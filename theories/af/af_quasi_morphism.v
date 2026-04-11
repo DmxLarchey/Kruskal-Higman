@@ -22,13 +22,13 @@ Import ListNotations lift_notations.
 
 Set Implicit Arguments.
 
-#[local] Notation FAN lw := (λ c, Forall2 (λ x l, x ∈ l) c lw).
+#[local] Abbreviation FAN lw := (λ c, Forall2 (λ x l, x ∈ l) c lw).
 
 Section af_quasi_morphism.
 
   Variables (X Y : Type) (ev : X → Y).
 
-  Notation ana_rel := (λ y x, ev x = y).
+  Abbreviation ana_rel := (λ y x, ev x = y).
 
   Variables (* ev has finite inverse images *)
             (ana_fin : ∀y, fin (ana_rel y))
@@ -138,7 +138,7 @@ Section af_quasi_morph.
   Variables (X Y : Type) (ea_rel : X → Y → Prop).
 
   Notation "x '⇝' y" := (ea_rel x y) (at level 70, no associativity, format "x ⇝ y").
-  Notation ana_rel := (λ y x, x⇝y).
+  Abbreviation ana_rel := (λ y x, x⇝y).
 
   Variables (ea_fun : ∀ x y₁ y₂, x⇝y₁ → x⇝y₂ → y₁ = y₂)
             (ea_total : ∀ x, { y | x⇝y })

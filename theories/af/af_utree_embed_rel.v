@@ -47,8 +47,8 @@ Section af_utree_nodes_rel.
 
   Let X' := (X+Y*utree X Y)%type.
 
-  Notation "⦗ x ⦘₁" := (inl x) (at level 1, format "⦗ x ⦘₁").
-  Notation "⦗ y , t ⦘₂" := (inr (y,t)) (at level 1, format "⦗ y , t ⦘₂").
+  Notation "⦗ x ⦘₁" := (inl x) (at level 0, format "⦗ x ⦘₁").
+  Notation "⦗ y , t ⦘₂" := (inr (y,t)) (at level 0, format "⦗ y , t ⦘₂").
 
   Inductive hig_rel_leaves : rel₂ X' :=
     | hig_rel_leaves_refl u v :
@@ -61,7 +61,7 @@ Section af_utree_nodes_rel.
 
   Hint Constructors hig_rel_leaves : core.
 
-  Notation R' := hig_rel_leaves.
+  Abbreviation R' := hig_rel_leaves.
 
   Local Fact hig_rel_leaves_inv x1' x2' :
            R' x1' x2'
@@ -181,7 +181,7 @@ Section af_utree_nodes_rel.
       * destruct y.
   Qed.
 
-  Notation ana c := (λ t t', t' -[c]-> t).
+  Abbreviation ana c := (λ t t', t' -[c]-> t).
 
   Section analysis_cases.
 
@@ -226,7 +226,7 @@ Section af_utree_nodes_rel.
     | disapointing_cons y t :   T α y → disapointing ◩ ⟨y|t⟩₁
     | disapointing_nest c y t : τ ≼ t → disapointing c ⟨⦗y,t⦘₂⟩₀.
 
-  Notation D' := disapointing.
+  Abbreviation D' := disapointing.
 
   Hint Constructors disapointing : core.
 
@@ -251,7 +251,7 @@ Section af_utree_nodes_rel.
 
   Local Definition has_disapointing c t := (λ s, s ≤ut t) ⧫ D' c.
 
-  Notation E' := has_disapointing.
+  Abbreviation E' := has_disapointing.
 
   Local Fact disap_has_disap c : D' c ⊆₁ E' c.
   Proof. intros t; exists t; auto with utree_db. Qed.
@@ -284,7 +284,7 @@ Section af_utree_nodes_rel.
       revert H1 IH2; intros [] []; eauto with utree_db.
   Qed.
 
-  Notation E c t := (ana c t ⊆₁ E' c).
+  Abbreviation E c t := (ana c t ⊆₁ E' c).
 
   Section exceptional_vs_embedding.
 
@@ -358,8 +358,8 @@ Section af_utree_nodes_rel.
 
   End af_choice.
 
-  Notation c₀ := af_choice_sT.
-  Notation Hc₀ := af_choice_sT_spec. (* sT = Some c₀ *)
+  Abbreviation c₀ := af_choice_sT.
+  Abbreviation Hc₀ := af_choice_sT_spec. (* sT = Some c₀ *)
 
   Local Lemma exceptional_embed t : E c₀ t → ⟨α|τ⟩₁ ≼ t.
   Proof.

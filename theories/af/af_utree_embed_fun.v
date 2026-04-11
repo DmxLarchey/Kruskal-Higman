@@ -59,8 +59,8 @@ Section af_utree_nodes.
       Finally, the quasi morphism transports this AF property to
       (utree_embed R T)↑⟨α|τ⟩₁. *)
 
-  Notation "⦗ x ⦘₁" := (inl x) (at level 1, format "⦗ x ⦘₁").
-  Notation "⦗ y , t ⦘₂" := (inr (y,t)) (at level 1, format "⦗ y , t ⦘₂").
+  Notation "⦗ x ⦘₁" := (inl x) (at level 0, format "⦗ x ⦘₁").
+  Notation "⦗ y , t ⦘₂" := (inr (y,t)) (at level 0, format "⦗ y , t ⦘₂").
 
   (** The new types of leaves X' and nodes Y':
        - X' := X + Y x utree X Y
@@ -68,7 +68,7 @@ Section af_utree_nodes.
        - c is a parameter that is related to sT quite late in the proof.
       Remark that sT = None is not possible because α inhabits Y. *)
 
-  Notation X' := (X+Y*utree X Y)%type.
+  Abbreviation X' := (X+Y*utree X Y)%type.
 
   (* c := ◩ represents the situation where T on nodes of arity 1 is af
      c := ▣ represents the situation where T on nodes of arity 1 if full 
@@ -91,7 +91,7 @@ Section af_utree_nodes.
             → (utree_embed R T)↑τ s t
             → hl_rel_leaves ⦗u,s⦘₂ ⦗v,t⦘₂.
 
-  Notation R' := hl_rel_leaves.
+  Abbreviation R' := hl_rel_leaves.
 
   (* The relation R' on X+Y*utree X Y is equivalent to R + T*(utree_embed R T)↑τ
      and well be proved AF by Ramsey and the induction hypotheses. *)
@@ -201,7 +201,7 @@ Section af_utree_nodes.
       in 2014. This renders the proof mostly undeciphereable. *)
 
   (* ana(lysis) is the converse relation of evaluation *)
-  Notation ana := (λ c t t', ev c t' = t).
+  Abbreviation ana := (λ c t t', ev c t' = t).
 
   (** We put the ana(lysis) predicate in a shape compatible with
       the KruskalFinite library tools *)
@@ -263,7 +263,7 @@ Section af_utree_nodes.
 
   Hint Constructors disapointing : core.
 
-  Notation D' := disapointing.
+  Abbreviation D' := disapointing.
 
   Local Fact disapointing_inv c t' :
            D' c t'
@@ -287,7 +287,7 @@ Section af_utree_nodes.
   Local Definition has_disapointing c t := ∃s, s ≤ut t ∧ D' c s.
 
   (* Exceptional is "has a dispointing sub-tree" *)
-  Notation E' := has_disapointing.
+  Abbreviation E' := has_disapointing.
 
   Local Fact disap_has_disap : D' ⊆₂ E'.
   Proof. intros ? t; exists t; auto with utree_db. Qed.
@@ -316,7 +316,7 @@ Section af_utree_nodes.
 
       Below we show that exceptional evaluations are exactly those embedding ⟨α|τ⟩₁ *)
 
-  Notation E c t := (ana c t ⊆₁ E' c).
+  Abbreviation E c t := (ana c t ⊆₁ E' c).
 
   Section exceptional_vs_embedding.
 
@@ -425,8 +425,8 @@ Section af_utree_nodes.
 
   End af_choice.
 
-  Notation c₀ := af_choice_sT.
-  Notation Hc₀ := af_choice_sT_spec.  (* sT = Some c₀ *)
+  Abbreviation c₀ := af_choice_sT.
+  Abbreviation Hc₀ := af_choice_sT_spec.  (* sT = Some c₀ *)
 
   (* T is full when c₀ = ▣ *)
   Local Theorem exceptional_embed t : E c₀ t → ⟨α|τ⟩₁ ≼ t.
